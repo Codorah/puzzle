@@ -1,16 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import './index.css';
 
-const GRID_SIZE = 3;
-const TILE_COUNT = GRID_SIZE * GRID_SIZE;
-
 // --- Professional SVG Icons ---
 const Icons = {
   Gallery: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="7" height="7" x="3" y="3" rx="1" /><rect width="7" height="7" x="14" y="3" rx="1" /><rect width="7" height="7" x="14" y="14" rx="1" /><rect width="7" height="7" x="3" y="14" rx="1" /></svg>,
   Settings: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" /></svg>,
-  Shuffle: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /></svg>,
-  Hint: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 15 4-8 4 8" /><path d="M4 13h6" /><circle cx="18" cy="12" r="3" /><path d="M18 9v6" /></svg>,
-  Preview: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg>,
+  Shuffle: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>,
+  Hint: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M7 13v-3a1 1 0 0 1 1-1h1"/><path d="M15 17v-4a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v4"/><path d="M15 15h2"/><path d="M7 17h2"/></svg>, // Simple "1-3" numeric hint icon
+  Preview: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>,
   Share: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" /><polyline points="16 6 12 2 8 6" /><line x1="12" x2="12" y1="2" y2="15" /></svg>,
   Upload: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" x2="12" y1="3" y2="15" /></svg>
 };
@@ -29,6 +26,10 @@ const TRANSLATIONS = {
     appearance: "Apparence",
     sound: "Son",
     mute: "Muet",
+    level: "Niveau",
+    easy: "Facile",
+    medium: "Moyen",
+    hard: "Difficile",
     bio: "Ingénieure IA & Prompt Engineer passionnée. Fondatrice de Codorah.",
     link: "Voir Profil",
     back: "Retour au Jeu"
@@ -46,6 +47,10 @@ const TRANSLATIONS = {
     appearance: "Appearance",
     sound: "Sound",
     mute: "Mute",
+    level: "Level",
+    easy: "Easy",
+    medium: "Medium",
+    hard: "Hard",
     bio: "AI Engineer & Prompt Engineer. Founder of Codorah.",
     link: "View Profile",
     back: "Back to Game"
@@ -63,6 +68,10 @@ const TRANSLATIONS = {
     appearance: "Apariencia",
     sound: "Sonido",
     mute: "Mudo",
+    level: "Nivel",
+    easy: "Fácil",
+    medium: "Medio",
+    hard: "Difícil",
     bio: "Ingeniera de IA y Prompt Engineer. Fundadora de Codorah.",
     link: "Ver Perfil",
     back: "Volver"
@@ -79,6 +88,9 @@ const DEFAULT_GALLERY = [
 ];
 
 export default function App() {
+  const [gridSize, setGridSize] = useState(3);
+  const TILE_COUNT = gridSize * gridSize;
+
   const [tiles, setTiles] = useState([...Array(TILE_COUNT).keys()]);
   const [image, setImage] = useState('/gallery/puzzle-4.png');
   const [isSolved, setIsSolved] = useState(false);
@@ -91,6 +103,7 @@ export default function App() {
   const [theme, setTheme] = useState('dark');
   const [showHints, setShowHints] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [showLevelSelect, setShowLevelSelect] = useState(false);
   const [secretMessage, setSecretMessage] = useState('');
   const [messageInput, setMessageInput] = useState('');
   const [userName, setUserName] = useState('Player');
@@ -98,15 +111,25 @@ export default function App() {
 
   const t = (key) => TRANSLATIONS[lang][key] || key;
 
+  // Sync Grid
+  useEffect(() => {
+    setTiles([...Array(TILE_COUNT).keys()]);
+    setIsSolved(false); setIsPlaying(false); setMoves(0); setTime(0);
+    document.documentElement.style.setProperty('--grid-size', gridSize);
+  }, [gridSize]);
+
   // Initialize & URL Check
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const msg = params.get('msg');
     const imgIdx = params.get('img');
     const name = params.get('u');
+    const level = parseInt(params.get('lvl'));
+
     if (msg) try { setSecretMessage(atob(msg)); } catch (e) { }
     if (imgIdx && DEFAULT_GALLERY[imgIdx]) setImage(DEFAULT_GALLERY[imgIdx]);
     if (name) setUserName(name);
+    if (level && [3, 4, 5].includes(level)) setGridSize(level);
 
     setTimeout(() => setIsReady(true), 3000);
   }, []);
@@ -138,27 +161,34 @@ export default function App() {
     } catch (e) { }
   }, [soundEnabled]);
 
-  const shuffle = () => {
-    let newTiles = [...tiles];
-    for (let i = 0; i < 200; i++) {
-      const emptyIdx = newTiles.indexOf(TILE_COUNT - 1);
-      const r = Math.floor(emptyIdx / GRID_SIZE), c = emptyIdx % GRID_SIZE;
-      const valid = [];
-      if (r > 0) valid.push(emptyIdx - GRID_SIZE);
-      if (r < GRID_SIZE - 1) valid.push(emptyIdx + GRID_SIZE);
-      if (c > 0) valid.push(emptyIdx - 1);
-      if (c < GRID_SIZE - 1) valid.push(emptyIdx + 1);
-      const move = valid[Math.floor(Math.random() * valid.length)];
-      [newTiles[emptyIdx], newTiles[move]] = [newTiles[move], newTiles[emptyIdx]];
-    }
-    setTiles(newTiles); setIsSolved(false); setMoves(0); setTime(0); setIsPlaying(true);
+  const shuffle = (level) => {
+    if (!level) { setShowLevelSelect(true); return; }
+    setShowLevelSelect(false);
+    setGridSize(level);
+    
+    // Defer shuffle to let state update tiles
+    setTimeout(() => {
+      let newTiles = [...Array(level * level).keys()];
+      for (let i = 0; i < 400; i++) {
+          const emptyIdx = newTiles.indexOf(level * level - 1);
+          const r = Math.floor(emptyIdx / level), c = emptyIdx % level;
+          const valid = [];
+          if (r > 0) valid.push(emptyIdx - level);
+          if (r < level - 1) valid.push(emptyIdx + level);
+          if (c > 0) valid.push(emptyIdx - 1);
+          if (c < level - 1) valid.push(emptyIdx + 1);
+          const move = valid[Math.floor(Math.random() * valid.length)];
+          [newTiles[emptyIdx], newTiles[move]] = [newTiles[move], newTiles[emptyIdx]];
+      }
+      setTiles(newTiles); setIsSolved(false); setMoves(0); setTime(0); setIsPlaying(true);
+    }, 10);
   };
 
   const handleTileClick = (idx) => {
     if (isSolved || !isReady || !isPlaying) return;
     const emptyIdx = tiles.indexOf(TILE_COUNT - 1);
-    const r = Math.floor(idx / GRID_SIZE), c = idx % GRID_SIZE;
-    const er = Math.floor(emptyIdx / GRID_SIZE), ec = emptyIdx % GRID_SIZE;
+    const r = Math.floor(idx / gridSize), c = idx % gridSize;
+    const er = Math.floor(emptyIdx / gridSize), ec = emptyIdx % gridSize;
     if ((Math.abs(r - er) + Math.abs(c - ec)) === 1) {
       const newTiles = [...tiles];
       [newTiles[emptyIdx], newTiles[idx]] = [newTiles[idx], newTiles[emptyIdx]];
@@ -170,7 +200,7 @@ export default function App() {
   const handleShare = () => {
     const imgIdx = DEFAULT_GALLERY.indexOf(image);
     const msg = btoa(messageInput || secretMessage);
-    const url = `${window.location.origin}${window.location.pathname}?img=${imgIdx >= 0 ? imgIdx : 0}&msg=${msg}&u=${encodeURIComponent(userName)}`;
+    const url = `${window.location.origin}${window.location.pathname}?img=${imgIdx >= 0 ? imgIdx : 0}&msg=${msg}&u=${encodeURIComponent(userName)}&lvl=${gridSize}`;
     if (navigator.share) navigator.share({ title: `Challenge by ${userName}`, url });
     else { navigator.clipboard.writeText(url); alert(t('copied')); }
   };
@@ -190,39 +220,57 @@ export default function App() {
           </div>
         </header>
 
-        {!secretMessage && !isPlaying && (
+        {!secretMessage && (
           <div className="msg-bar">
-            <input type="text" placeholder={t('writeMsg')} value={messageInput} onChange={(e) => setMessageInput(e.target.value)} />
+            <input 
+              type="text" 
+              maxLength="100"
+              placeholder={t('writeMsg')} 
+              value={messageInput} 
+              onChange={(e) => setMessageInput(e.target.value)} 
+            />
           </div>
         )}
 
         <main className="game-area">
           <div className="board-wrapper">
-            <div className="board">
+            <div className="board" style={{ gridTemplateColumns: `repeat(var(--grid-size), 1fr)` }}>
               {tiles.map((v, i) => {
                 const isEmpty = v === TILE_COUNT - 1;
-                const x = (v % GRID_SIZE);
-                const y = Math.floor(v / GRID_SIZE);
+                const x = (v % gridSize);
+                const y = Math.floor(v / gridSize);
                 return (
-                  <div
-                    key={i}
-                    className={`tile ${isEmpty ? 'empty' : ''}`}
-                    onClick={() => handleTileClick(i)}
-                    style={!isEmpty ? {
-                      backgroundImage: `url(${image})`,
-                      backgroundSize: 'calc(var(--tile-size) * 3)',
-                      backgroundPosition: `calc(-1 * ${x} * var(--tile-size)) calc(-1 * ${y} * var(--tile-size))`,
-                      position: 'relative'
-                    } : {}}
-                  >
-                    {showHints && !isEmpty && (
-                      <span style={{ position: 'absolute', top: 4, left: 4, background: 'rgba(0,0,0,0.5)', color: '#fff', borderRadius: '50%', width: 20, height: 20, fontSize: '0.7rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        {v + 1}
-                      </span>
-                    )}
+                  <div 
+                      key={i}
+                      className={`tile ${isEmpty ? 'empty' : ''}`}
+                      onClick={() => handleTileClick(i)}
+                      style={!isEmpty ? {
+                        backgroundImage: `url(${image})`,
+                        backgroundSize: `calc(100% * var(--grid-size)) calc(100% * var(--grid-size))`,
+                        backgroundPosition: `calc(-100% * ${x} * var(--grid-size) / (var(--grid-size) * var(--grid-size) - var(--grid-size))) calc(-100% * ${y} * var(--grid-size) / (var(--grid-size) * var(--grid-size) - var(--grid-size)))`,
+                        /* Better formula for percentages to avoid scaling issues */
+                        backgroundPositionX: `${(x / (gridSize - 1)) * 100}%`,
+                        backgroundPositionY: `${(y / (gridSize - 1)) * 100}%`,
+                        position: 'relative'
+                      } : {}}
+                    >
+                      {showHints && !isEmpty && (
+                        <span className="tile-hint">
+                          {v+1}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
+                {showLevelSelect && (
+                  <div className="mini-modal glass">
+                     <div style={{display:'flex', flexDirection:'column', gap: 8, width: '100%'}}>
+                        <button className="btn-premium btn-main" style={{padding:'8px 12px', fontSize:'0.85rem'}} onClick={() => shuffle(3)}>{t('easy')} 3x3</button>
+                        <button className="btn-premium btn-main" style={{padding:'8px 12px', fontSize:'0.85rem'}} onClick={() => shuffle(4)}>{t('medium')} 4x4</button>
+                        <button className="btn-premium btn-main" style={{padding:'8px 12px', fontSize:'0.85rem'}} onClick={() => shuffle(5)}>{t('hard')} 5x5</button>
+                     </div>
                   </div>
-                );
-              })}
+                )}
             </div>
           </div>
 
@@ -232,12 +280,12 @@ export default function App() {
           </div>
 
           <div className="action-bar">
-            <button className="btn-premium btn-main" onClick={shuffle}>
+            <button className="btn-premium btn-main" onClick={() => shuffle()}>
               <Icons.Shuffle style={{ marginRight: 8 }} /> {t('shuffle')}
             </button>
             <button className={`btn-premium btn-icon ${showHints ? 'active' : ''}`} onClick={() => setShowHints(!showHints)}>
-              <Icons.Hint />
-            </button>
+                <Icons.Hint />
+             </button>
             <button className="btn-premium btn-icon" onClick={() => setShowPreview(true)}>
               <Icons.Preview />
             </button>
@@ -250,6 +298,7 @@ export default function App() {
             <div className="win-overlay" style={{ marginTop: 20 }}>
               <div style={{ fontSize: '1.4rem', marginBottom: 10 }}>{t('win')}</div>
               {(secretMessage || messageInput) && <div style={{ borderTop: '1px solid rgba(0,0,0,0.1)', paddingTop: 10 }}>{secretMessage || messageInput}</div>}
+              {userName && <div style={{fontSize: '0.8rem', opacity: 0.8, marginTop: 5}}>Challenge by {userName}</div>}
             </div>
           )}
         </main>
