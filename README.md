@@ -1,21 +1,23 @@
-# 🧩 Premium Puzzle PWA
+# 🧩 Lumina: Premium Puzzle
 
-A high-fidelity, Progressive Web Application (PWA) sliding puzzle game built with React and Vite. It features a luxurious dark theme with bordeaux and gold accents, offering a premium user experience with zero compromises on performance and security.
+A world-class, high-fidelity Progressive Web Application (PWA) sliding puzzle game. **Lumina** combines a minimalist, glassmorphic aesthetic with advanced front-end engineering to deliver a truly premium gaming experience.
 
 ## ✨ Features
-- **Custom Photo Uploads**: Users can upload their own images to slice into a custom puzzle on-the-fly.
-- **Mathematical Solvability**: The shuffle algorithm ensures all generated puzzles are 100% solvable by executing a series of reversed legal moves from the solved state.
-- **Progressive Web App (PWA)**: Fully installable and offline-capable, leveraging service workers to cache assets securely.
-- **Advanced Micro-Interactions**: Includes real-time move counters, a built-in timer, subtle CSS micro-animations, and synthesized sound effects via the Web Audio API.
+- **Lumina Branding**: A sophisticated identity focused on light, precision, and elegance.
+- **Glassmorphic UI**: High-end visual effects using frosted glass backgrounds and subtle obsidian-to-slate gradients.
+- **Custom Photo Engine**: Securely upload and slice your own photos into high-resolution puzzles.
+- **Curated Gallery**: includes a professional collection of premium abstract and cosmic photography.
+- **Universal Accessibility**: 
+  - **Multi-language**: Seamless switching between French 🇫🇷, English 🇺🇸, and Spanish 🇪🇸.
+  - **Theming**: Premium Dark and Light modes for any lighting environment.
+- **PWA Excellence**: Installable on any device with offline play support via optimized Service Workers.
+- **Seamless Board**: Precisely calibrated tile alignment with zero gaps for an immersive visual experience.
 
 ## 🔒 Security Posture
-Security is a first-class citizen in this project, adopting modern defense-in-depth strategies:
-- **Client-Side File Validation (Anti-XSS/DoS)**: Strict MIME-type whitelisting (`image/jpeg`, `image/png`, `image/webp`) prevents malicious SVG payload executions. Hard file-size caps prevent potential client memory crashes.
-- **Supply Chain Guardrails**: Regular `npm audit` pipelines ensure dependencies remain free of high-severity vulnerabilities.
-- **Hardened HTTP Headers**: Implements `vercel.json` to enforce strict isolation:
-  - `X-Frame-Options: DENY` (Clickjacking prevention)
-  - `X-Content-Type-Options: nosniff` (MIME-sniffing prevention)
-  - `Referrer-Policy: strict-origin-when-cross-origin`
+Built with a "Security-First" mindset:
+- **XSS & DoS Protection**: Strict MIME-type validation (`JPG`, `PNG`, `WEBP`) and 5MB payload limits for image uploads.
+- **Hardened Headers**: `vercel.json` inclusion for `X-Frame-Options: DENY` and `nosniff` protection.
+- **Supply Chain Integrity**: Audited dependencies to ensure a clean software lifecycle.
 
 ## 🚀 Quick Start
 
@@ -27,21 +29,20 @@ Security is a first-class citizen in this project, adopting modern defense-in-de
 
 2. **Install dependencies**:
    ```bash
-   npm install
+   npm install --legacy-peer-deps
    ```
 
-3. **Run the local development server**:
+3. **Run development server**:
    ```bash
    npm run dev
    ```
 
 ## 🌐 Deployment
-This project is optimized for a zero-configuration deployment to **Vercel**. 
+Optimized for **Vercel**:
 ```bash
 npm run build
 vercel --prod
 ```
-The accompanying `vercel.json` will automatically secure the deployment headers out of the box.
 
 ---
-*Developed with a focus on seamless user experience, responsive web design, and front-end security.*
+*Developed by Elodie ATANA (Codorah) — Bridging AI, Design, and Engineering.*

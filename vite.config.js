@@ -9,11 +9,11 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
-        name: 'Taquin Premium',
-        short_name: 'Taquin',
-        description: 'Jeu de puzzle coulissant interactif et hors-ligne',
-        theme_color: '#2b0000',
-        background_color: '#121212',
+        name: 'Lumina: Premium Puzzle',
+        short_name: 'Lumina',
+        description: 'A world-class sliding puzzle experience.',
+        theme_color: '#0f1115',
+        background_color: '#0f1115',
         display: 'standalone',
         icons: [
           {
