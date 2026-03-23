@@ -11,16 +11,12 @@ const TRANSLATIONS = {
     shuffle: "Mélanger",
     gallery: "Galerie",
     settings: "Options",
-    packs: "Collections",
-    upload: "Importer",
+    writeMsg: "Écris un message mystère...",
     win: "Lumina: Succès",
-    solved: "Tableau complété",
-    details: "en {moves} mouvements • {time}",
-    appearance: "Thème",
-    lang: "Langue",
+    copied: "Lien copié !",
     bio: "Ingénieure IA & Prompt Engineer passionnée. Fondatrice de Codorah.",
     link: "Voir Profil",
-    back: "Retour"
+    back: "Retour au Jeu"
   },
   en: {
     moves: "Moves",
@@ -28,16 +24,12 @@ const TRANSLATIONS = {
     shuffle: "Shuffle",
     gallery: "Gallery",
     settings: "Options",
-    packs: "Collections",
-    upload: "Import",
+    writeMsg: "Write a mystery message...",
     win: "Lumina: Success",
-    solved: "Puzzle Solved",
-    details: "in {moves} moves • {time}",
-    appearance: "Theme",
-    lang: "Language",
+    copied: "Link copied!",
     bio: "AI Engineer & Prompt Engineer. Founder of Codorah.",
     link: "View Profile",
-    back: "Back"
+    back: "Back to Game"
   },
   es: {
     moves: "Pasos",
@@ -45,13 +37,9 @@ const TRANSLATIONS = {
     shuffle: "Mezclar",
     gallery: "Galería",
     settings: "Opciones",
-    packs: "Colecciones",
-    upload: "Importar",
+    writeMsg: "Escribe un mensaje...",
     win: "Lumina: Éxito",
-    solved: "Rompecabezas Resuelto",
-    details: "en {moves} pasos • {time}",
-    appearance: "Tema",
-    lang: "Idioma",
+    copied: "¡Copiado!",
     bio: "Ingeniera de IA y Prompt Engineer. Fundadora de Codorah.",
     link: "Ver Perfil",
     back: "Volver"
@@ -59,6 +47,7 @@ const TRANSLATIONS = {
 };
 
 const DEFAULT_GALLERY = [
+  '/gallery/puzzle-4.png',
   '/gallery/puzzle-1.png',
   '/gallery/puzzle-2.png',
   '/gallery/puzzle-3.png'
@@ -66,37 +55,37 @@ const DEFAULT_GALLERY = [
 
 export default function App() {
   const [tiles, setTiles] = useState([...Array(TILE_COUNT).keys()]);
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState('/gallery/puzzle-4.png');
   const [isSolved, setIsSolved] = useState(false);
   const [moves, setMoves] = useState(0);
   const [time, setTime] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isReady, setIsReady] = useState(false);
-  const [view, setView] = useState('board'); // 'board', 'gallery', 'settings'
+  const [view, setView] = useState('board'); 
   const [lang, setLang] = useState('fr');
   const [theme, setTheme] = useState('dark');
+  const [showHints, setShowHints] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const [secretMessage, setSecretMessage] = useState('');
+  const [messageInput, setMessageInput] = useState('');
 
   const t = (key) => TRANSLATIONS[lang][key] || key;
 
-  // Initialize
   useEffect(() => {
-    const timer = setTimeout(() => setIsReady(true), 3000);
-    return () => clearTimeout(timer);
+    const params = new URLSearchParams(window.location.search);
+    const msg = params.get('msg');
+    const imgIdx = params.get('img');
+    if (msg) try { setSecretMessage(atob(msg)); } catch(e) {}
+    if (imgIdx && DEFAULT_GALLERY[imgIdx]) setImage(DEFAULT_GALLERY[imgIdx]);
+    
+    setTimeout(() => setIsReady(true), 3000);
   }, []);
 
-  // Timer
   useEffect(() => {
     let interval;
-    if (isPlaying && !isSolved) {
-      interval = setInterval(() => setTime((v) => v + 1), 1000);
-    }
+    if (isPlaying && !isSolved) interval = setInterval(() => setTime((v) => v + 1), 1000);
     return () => clearInterval(interval);
   }, [isPlaying, isSolved]);
-
-  // Theme
-  useEffect(() => {
-    document.body.className = theme === 'light' ? 'light-theme' : '';
-  }, [theme]);
 
   const playSound = useCallback(() => {
     try {
@@ -106,12 +95,10 @@ export default function App() {
       osc.type = 'sine';
       osc.frequency.setValueAtTime(440, ctx.currentTime);
       osc.frequency.exponentialRampToValueAtTime(110, ctx.currentTime + 0.15);
-      g.gain.setValueAtTime(0.1, ctx.currentTime);
+      g.gain.setValueAtTime(0.05, ctx.currentTime);
       g.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.15);
-      osc.connect(g);
-      g.connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.15);
+      osc.connect(g); g.connect(ctx.destination);
+      osc.start(); osc.stop(ctx.currentTime + 0.15);
     } catch(e) {}
   }, []);
 
@@ -128,73 +115,75 @@ export default function App() {
         const move = valid[Math.floor(Math.random() * valid.length)];
         [newTiles[emptyIdx], newTiles[move]] = [newTiles[move], newTiles[emptyIdx]];
     }
-    setTiles(newTiles);
-    setIsSolved(false); setMoves(0); setTime(0); setIsPlaying(true);
+    setTiles(newTiles); setIsSolved(false); setMoves(0); setTime(0); setIsPlaying(true);
   };
 
   const handleTileClick = (idx) => {
-    if (isSolved || !isReady) return;
+    if (isSolved || !isReady || !isPlaying) return;
     const emptyIdx = tiles.indexOf(TILE_COUNT - 1);
     const r = Math.floor(idx / GRID_SIZE), c = idx % GRID_SIZE;
     const er = Math.floor(emptyIdx / GRID_SIZE), ec = emptyIdx % GRID_SIZE;
     if ((Math.abs(r - er) + Math.abs(c - ec)) === 1) {
         const newTiles = [...tiles];
         [newTiles[emptyIdx], newTiles[idx]] = [newTiles[idx], newTiles[emptyIdx]];
-        setTiles(newTiles);
-        setMoves((m) => m + 1);
-        playSound();
-        if (newTiles.every((v, i) => v === i)) {
-            setIsSolved(true); setIsPlaying(false);
-        }
+        setTiles(newTiles); setMoves((m) => m + 1); playSound();
+        if (newTiles.every((v, i) => v === i)) { setIsSolved(true); setIsPlaying(false); }
     }
   };
 
-  const handleUpload = (e) => {
-    const f = e.target.files[0];
-    if (!f) return;
-    setImage(URL.createObjectURL(f));
-    setTiles([...Array(TILE_COUNT).keys()]);
-    setView('board'); setIsSolved(false); setMoves(0); setTime(0);
+  const handleShare = () => {
+    const imgIdx = DEFAULT_GALLERY.indexOf(image);
+    const msg = btoa(messageInput || secretMessage);
+    const url = `${window.location.origin}${window.location.pathname}?img=${imgIdx >= 0 ? imgIdx : 0}&msg=${msg}`;
+    if (navigator.share) navigator.share({ title: 'Lumina Challenge', url });
+    else { navigator.clipboard.writeText(url); alert(t('copied')); }
   };
 
   const formatTime = (s) => `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`;
 
   return (
     <>
-      {!isReady && (
-        <div className="splash-screen">
-            <h1 className="splash-logo">LUMINA</h1>
-        </div>
-      )}
+      {!isReady && <div className="splash-screen"><h1 className="splash-logo">LUMINA</h1></div>}
 
       <div className="app-container">
         <header>
-          <h1 className="logo-text">LU<span>MINA</span></h1>
-          <div style={{display: 'flex', gap: 12}}>
-            <button className="btn-secondary" onClick={() => setView('gallery')}>🖼️</button>
-            <button className="btn-secondary" onClick={() => setView('settings')}>⚙️</button>
+          <div className="logo-text">LU<span>MINA</span></div>
+          <div style={{display: 'flex', gap: 10}}>
+             <button className="btn-icon btn-premium" style={{height: 50, width: 50}} onClick={() => setView('gallery')}>🖼️</button>
+             <button className="btn-icon btn-premium" style={{height: 50, width: 50}} onClick={() => setView('settings')}>⚙️</button>
           </div>
         </header>
+
+        {!secretMessage && !isPlaying && (
+           <div className="msg-bar">
+              <input type="text" placeholder={t('writeMsg')} value={messageInput} onChange={(e) => setMessageInput(e.target.value)} />
+           </div>
+        )}
 
         <main className="game-area">
           <div className="board-wrapper">
              <div className="board">
                 {tiles.map((v, i) => {
                   const isEmpty = v === TILE_COUNT - 1;
-                  const x = (v % GRID_SIZE) * 110;
-                  const y = Math.floor(v / GRID_SIZE) * 110;
+                  const x = (v % GRID_SIZE);
+                  const y = Math.floor(v / GRID_SIZE);
                   return (
                     <div 
                       key={i}
                       className={`tile ${isEmpty ? 'empty' : ''}`}
                       onClick={() => handleTileClick(i)}
-                      style={!isEmpty && image ? {
+                      style={!isEmpty ? {
                         backgroundImage: `url(${image})`,
-                        backgroundSize: '330px 330px',
-                        backgroundPosition: `-${x}px -${y}px`
+                        backgroundSize: 'calc(var(--tile-size) * 3)',
+                        backgroundPosition: `calc(-1 * ${x} * var(--tile-size)) calc(-1 * ${y} * var(--tile-size))`,
+                        position: 'relative'
                       } : {}}
                     >
-                      {!image && !isEmpty && v + 1}
+                      {showHints && !isEmpty && (
+                        <span style={{position:'absolute', top: 4, left: 4, background:'rgba(0,0,0,0.5)', color:'#fff', borderRadius:'50%', width:20, height:20, fontSize:'0.7rem', display:'flex', alignItems:'center', justifyContent:'center'}}>
+                          {v+1}
+                        </span>
+                      )}
                     </div>
                   );
                 })}
@@ -202,84 +191,59 @@ export default function App() {
           </div>
 
           <div className="stats-bar">
-            <div className="stat-item">
-              <span className="stat-label">{t('moves')}</span>
-              <span className="stat-value">{moves}</span>
-            </div>
-            <div className="stat-item">
-               <span className="stat-label">{t('time')}</span>
-               <span className="stat-value">{formatTime(time)}</span>
-            </div>
+             <div className="stat-item"><span className="stat-label">{t('moves')}</span><span className="stat-value">{moves}</span></div>
+             <div className="stat-item"><span className="stat-label">{t('time')}</span><span className="stat-value">{formatTime(time)}</span></div>
           </div>
 
           <div className="action-bar">
-             <button className="btn-premium" onClick={shuffle}>{t('shuffle')}</button>
-             <label className="btn-secondary" style={{cursor: 'pointer'}}>
-                {t('upload')}
-                <input type="file" hidden accept="image/*" onChange={handleUpload} />
-             </label>
+             <button className="btn-premium btn-main" onClick={shuffle}>{t('shuffle')}</button>
+             <button className="btn-premium btn-icon" onClick={() => setShowHints(!showHints)}>{showHints ? '👁️' : '🔢'}</button>
+             <button className="btn-premium btn-icon" onClick={() => setShowPreview(true)}>❓</button>
+             <button className="btn-premium btn-icon" onClick={handleShare}>🔗</button>
           </div>
 
           {isSolved && (
-            <div style={{marginTop: 32, textAlign: 'center', animation: 'fadeIn 0.5s ease'}}>
-                <h2 style={{color: 'var(--accent-primary)', marginBottom: 4}}>{t('win')}</h2>
-                <p style={{color: 'var(--text-muted)', fontSize: '0.9rem'}}>
-                    {t('details').replace('{moves}', moves).replace('{time}', formatTime(time))}
-                </p>
+            <div className="win-overlay">
+               <div>{t('win')}</div>
+               {(secretMessage || messageInput) && <div style={{marginTop: 10, borderTop: '1px solid rgba(0,0,0,0.1)', paddingTop: 10}}>{secretMessage || messageInput}</div>}
             </div>
           )}
         </main>
       </div>
 
-      {(view === 'gallery' || view === 'settings') && (
+      {(view !== 'board' || showPreview) && (
         <div className="modal">
-          <div className="modal-backdrop" onClick={() => setView('board')}></div>
-          <div className="modal-card glass">
-             <div className="modal-header">
-                <h2 className="modal-title">{t(view)}</h2>
-             </div>
-             
-             {view === 'gallery' && (
-                <div className="gallery-grid">
-                  {DEFAULT_GALLERY.map((src, i) => (
-                    <div 
-                      key={i}
-                      className="gallery-item"
-                      style={{backgroundImage: `url(${src})` }}
-                      onClick={() => { setImage(src); setView('board'); setTiles([...Array(TILE_COUNT).keys()]); }}
-                    />
-                  ))}
+          <div className="modal-content glass">
+             {showPreview ? (
+                <div style={{textAlign: 'center'}}>
+                   <img src={image} style={{width: '100%', borderRadius: 20}} />
+                   <button className="btn-premium btn-main" style={{width: '100%', marginTop: 20}} onClick={() => setShowPreview(false)}>{t('back')}</button>
+                </div>
+             ) : view === 'gallery' ? (
+                <div>
+                   <h2 style={{marginTop: 0}}>{t('gallery')}</h2>
+                   <div className="gallery-grid">
+                      {DEFAULT_GALLERY.map((src, i) => (
+                        <div key={i} className="gallery-card" style={{backgroundImage:`url(${src})`}} onClick={() => {setImage(src); setView('board'); setIsPlaying(false); setTiles([...Array(TILE_COUNT).keys()]); }} />
+                      ))}
+                   </div>
+                   <button className="btn-premium btn-main" style={{width: '100%', marginTop: 20}} onClick={() => setView('board')}>{t('back')}</button>
+                </div>
+             ) : (
+                <div>
+                   <h2 style={{marginTop: 0}}>{t('settings')}</h2>
+                   <div style={{display:'flex', gap: 10, marginBottom: 20}}>
+                      <button className="btn-premium btn-icon" onClick={() => setLang('fr')}>FR</button>
+                      <button className="btn-premium btn-icon" onClick={() => setLang('en')}>EN</button>
+                   </div>
+                   <div className="bio-card">
+                      <div style={{fontWeight:800, color:'var(--accent-primary)'}}>Elodie ATANA</div>
+                      <p style={{fontSize:'0.85rem', color:'var(--text-muted)'}}>{t('bio')}</p>
+                      <a href="https://github.com/Codorah" target="_blank">{t('link')}</a>
+                   </div>
+                   <button className="btn-premium btn-main" style={{width: '100%', marginTop: 20}} onClick={() => setView('board')}>{t('back')}</button>
                 </div>
              )}
-
-             {view === 'settings' && (
-                <div style={{display: 'flex', flexDirection: 'column', gap: 24}}>
-                   <div className="setting-row">
-                      <span className="stat-label">{t('appearance')}</span>
-                      <div style={{display: 'flex', gap: 8, marginTop: 8}}>
-                        <button className="btn-secondary" onClick={() => setTheme('dark')}>🌙</button>
-                        <button className="btn-secondary" onClick={() => setTheme('light')}>☀️</button>
-                      </div>
-                   </div>
-                   <div className="setting-row">
-                      <span className="stat-label">{t('lang')}</span>
-                      <div style={{display: 'flex', gap: 8, marginTop: 8}}>
-                        <button className="btn-secondary" onClick={() => setLang('fr')}>FR</button>
-                        <button className="btn-secondary" onClick={() => setLang('en')}>EN</button>
-                        <button className="btn-secondary" onClick={() => setLang('es')}>ES</button>
-                      </div>
-                   </div>
-                   <div className="bio-box">
-                      <span className="bio-name">Elodie ATANA</span>
-                      <p style={{margin: '8px 0', color: 'var(--text-muted)'}}>{t('bio')}</p>
-                      <a href="https://github.com/Codorah" target="_blank" style={{color: 'var(--accent-primary)', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 700}}>{t('link')}</a>
-                   </div>
-                </div>
-             )}
-
-             <button className="btn-premium" style={{width: '100%', marginTop: 32}} onClick={() => setView('board')}>
-                {t('back')}
-             </button>
           </div>
         </div>
       )}
