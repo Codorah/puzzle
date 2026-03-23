@@ -16,6 +16,34 @@
   --tile-size: 100px; /* Default desktop */
 }
 
+.light-theme {
+  --bg-color: #f1f5f9;
+  --bg-gradient: radial-gradient(circle at top left, #ffffff, #e2e8f0);
+  --panel-bg: rgba(255, 255, 255, 0.9);
+  --glass-bg: rgba(15, 23, 42, 0.05); /* Darker tint for light mode */
+  --glass-border: rgba(15, 23, 42, 0.1);
+  --accent-primary: #854d0e; /* Much deeper gold for light mode contrast */
+  --accent-glow: rgba(133, 77, 14, 0.1);
+  --text-main: #0f172a;
+  --text-muted: #475569;
+}
+
+.btn-icon svg {
+  color: var(--text-main);
+  transition: transform 0.2s;
+}
+
+.btn-icon:active svg { transform: scale(0.9); }
+
+.action-bar .btn-icon {
+  background: var(--glass-bg);
+}
+
+.light-theme .action-bar .btn-icon {
+  background: rgba(15, 23, 42, 0.05);
+  border-color: rgba(15, 23, 42, 0.1);
+}
+
 @media (max-width: 480px) {
   :root {
     --tile-size: calc(28vw - 10px); /* Responsive for mobile */
