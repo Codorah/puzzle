@@ -73,10 +73,10 @@ export default function App() {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
 
-  // Image Aspect Ratio Calculation -> Replaced by True Square Cropping
+  // Image HD Upscaler & Square Cropping perfectly resolving the "Blurry" issue
   useEffect(() => {
     let isMounted = true;
-    const cropToSquare = (url) => {
+    const processImageToHD = (url) => {
       const img = new Image();
       img.crossOrigin = "anonymous";
       img.src = url;
@@ -86,16 +86,27 @@ export default function App() {
         const startX = (img.width - size) / 2;
         const startY = (img.height - size) / 2;
         
+        // Force HD Resolution (1080x1080 minimum) for ultra-sharp tiles
+        const HD_SIZE = Math.max(size, 1080);
+        
         const canvas = document.createElement('canvas');
-        canvas.width = size;
-        canvas.height = size;
+        canvas.width = HD_SIZE;
+        canvas.height = HD_SIZE;
         const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, startX, startY, size, size, 0, 0, size, size);
-        setCroppedImage(canvas.toDataURL('image/jpeg', 0.9));
+        
+        // Enable High-Quality Hardware Smoothing for the Upscale
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        
+        // Crop and Upscale simultaneously
+        ctx.drawImage(img, startX, startY, size, size, 0, 0, HD_SIZE, HD_SIZE);
+        
+        // Output as maximum quality JPEG
+        setCroppedImage(canvas.toDataURL('image/jpeg', 1.0));
       };
       img.onerror = () => { if(isMounted) setCroppedImage(url); }
     };
-    cropToSquare(image);
+    processImageToHD(image);
     return () => { isMounted = false; };
   }, [image]);
 
