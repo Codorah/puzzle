@@ -486,8 +486,34 @@ export default function App() {
 
   return (
     <div className="app-shell" onClick={unlockAudio}>
-      {/* 0. Splash Screen (Automatic) */}
-      {!isReady && (
+      {/* 1. Premium Audio Unlock Overlay (Glassmorphism) */}
+      {!audioUnlocked && (
+        <div className="audio-unlock-overlay">
+           <div className="unlock-content">
+             <div className="brand-logo" style={{ fontSize: '4.5rem', marginBottom: '20px' }}>
+               <span className="brand-col-1">LU</span><span className="brand-col-2">MINA</span>
+             </div>
+             <p style={{ color: 'var(--text-muted)', marginBottom: '40px', fontSize: '1.1rem', letterSpacing: '2px', fontWeight: 300 }}>PUZZLE ELITE</p>
+             <button 
+               className="btn-primary" 
+               style={{ 
+                 padding: '18px 50px', 
+                 borderRadius: '50px', 
+                 fontSize: '1.2rem', 
+                 fontWeight: 900,
+                 boxShadow: '0 0 40px rgba(59, 130, 246, 0.4)',
+                 border: '2px solid rgba(255, 255, 255, 0.1)'
+               }} 
+               onClick={unlockAudio}
+             >
+               COMMENCER
+             </button>
+           </div>
+        </div>
+      )}
+
+      {/* 2. Initial Loading Splash (Legacy fade-out for visual polish) */}
+      {audioUnlocked && !isReady && (
         <div className="splash-screen">
           <div className="brand-logo">
             <span className="brand-col-1">LU</span><span className="brand-col-2">MINA</span>
