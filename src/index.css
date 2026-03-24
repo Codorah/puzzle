@@ -74,7 +74,19 @@ header {
   align-items: center;
   justify-content: space-between;
   padding: 0 var(--spacing-lg);
-  z-index: 10;
+  height: var(--header-height);
+  position: sticky;
+  top: 0;
+  z-index: 500;
+  background: rgba(10, 10, 10, 0.95);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.header-controls {
+  display: flex;
+  gap: var(--spacing-sm);
 }
 
 .logo-text {
@@ -82,11 +94,13 @@ header {
   font-weight: 900;
   letter-spacing: -0.5px;
   text-shadow: 0 0 20px var(--accent-glow);
+  white-space: nowrap;
 }
 .logo-text span { color: var(--accent-primary); }
 
 .msg-bar {
-  padding: 0 var(--spacing-lg) var(--spacing-md);
+  padding: 10px var(--spacing-lg) var(--spacing-md);
+  z-index: 10;
 }
 
 .msg-bar input {
@@ -147,6 +161,8 @@ header {
   background-size: calc(100% * var(--grid-size)) calc(100% * var(--grid-size));
   transition: transform 0.1s ease-out;
   position: relative;
+  image-rendering: -webkit-optimize-contrast;
+  -webkit-backface-visibility: hidden;
 }
 
 .mini-modal {

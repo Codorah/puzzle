@@ -175,7 +175,7 @@ export default function App() {
       <div className="app-container">
         <header>
           <div className="logo-text">LU<span>MINA</span></div>
-          <div style={{ display: 'flex', gap: 12 }}>
+          <div className="header-controls">
             <button className="control-btn" onClick={() => setView('gallery')}><Icons.Gallery /><span>{t('gallery')}</span></button>
             <button className="control-btn" onClick={() => setView('settings')}><Icons.Settings /><span>{t('settings')}</span></button>
           </div>
