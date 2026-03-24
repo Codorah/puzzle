@@ -316,14 +316,16 @@ export default function App() {
 
         {/* Only show input if we are NOT playing a received mystery message */}
         {!secretMessage && (
-          <input
-            type="text"
-            className="input-premium"
-            style={{ maxWidth: '200px', padding: '8px 16px', fontSize: '0.9rem', background: 'transparent' }}
-            placeholder="Message secret..."
-            value={messageInput}
-            onChange={(e) => setMessageInput(e.target.value)}
-          />
+          <div style={{ flex: 1, minWidth: 0, margin: '0 12px', display: 'flex', justifyContent: 'center' }}>
+            <input
+              type="text"
+              className="input-premium"
+              style={{ width: '100%', maxWidth: '200px', padding: '8px 16px', fontSize: '0.9rem', background: 'transparent' }}
+              placeholder="Texte secret..."
+              value={messageInput}
+              onChange={(e) => setMessageInput(e.target.value)}
+            />
+          </div>
         )}
 
         <div className="header-actions">

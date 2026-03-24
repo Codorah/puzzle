@@ -64,8 +64,8 @@ body {
 .app-shell {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  width: 100vw;
+  height: 100dvh;
+  width: 100dvw;
   max-width: 100%;
 }
 
@@ -144,14 +144,15 @@ body {
 .puzzle-board {
   display: grid;
   width: 100%;
-  max-width: var(--max-board-size);
+  /* CRITICAL: Constrain max-width to the minimum of 500px OR the available screen height */
+  max-width: min(var(--max-board-size), calc(100dvh - var(--header-height) - var(--toolbar-height) - var(--spacing-md) * 2));
   aspect-ratio: 1 / 1;
-  max-height: calc(100vh - var(--header-height) - var(--toolbar-height) - 40px);
   background: var(--bg-secondary);
   border-radius: var(--radius-md);
   overflow: hidden;
   box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.8), 0 0 0 1px var(--glass-border);
   position: relative;
+  margin: 0 auto;
 }
 
 .tile {
@@ -286,7 +287,7 @@ body {
 .sheet-content {
   width: 100%;
   max-width: 600px;
-  max-height: 90vh; /* Safe max height */
+  max-height: 90dvh; /* Safe max height using dynamic viewport */
   background: var(--bg-primary);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-xl) var(--radius-xl) 0 0;
@@ -587,4 +588,15 @@ body {
   width: 14px;
   height: 14px;
   stroke-width: 3px;
+}
+
+/* --- Ultra-Responsive Overrides for Tiny Screens --- */
+@media (max-width: 400px) {
+  .app-header { padding: 0 var(--spacing-sm); }
+  .brand-logo { font-size: 1.2rem; }
+  .btn-icon-labeled { min-width: 45px; padding: 4px; font-size: 0.65rem; }
+  .btn-icon-labeled svg { width: 20px; height: 20px; }
+  .app-toolbar { gap: 8px; padding: 0 var(--spacing-xs); }
+  .settings-page-header { padding: 0 var(--spacing-md); }
+  .settings-page-content { padding: var(--spacing-md); }
 }
