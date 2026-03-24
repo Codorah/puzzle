@@ -600,3 +600,30 @@ body {
   .settings-page-header { padding: 0 var(--spacing-md); }
   .settings-page-content { padding: var(--spacing-md); }
 }
+
+/* Celebration Particles (Elite UX) */
+.celebration-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.particle {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: var(--accent-gold);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--accent-gold);
+  animation: particleRise 2s ease-out var(--delay) infinite;
+  opacity: 0;
+}
+
+@keyframes particleRise {
+  0% { transform: translateY(0) translateX(0) scale(1); opacity: 1; }
+  100% { transform: translateY(-300px) translateX(var(--x)) scale(0); opacity: 0; }
+}
+

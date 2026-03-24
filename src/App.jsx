@@ -28,6 +28,14 @@ const DEFAULT_GALLERY = [
 ];
 
 /**
+ * Audio Assets (Royalty-free/Public placeholders)
+ */
+const SFX = {
+  slide: new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'),
+  victory: new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3')
+};
+
+/**
  * i18n Translation Dictionary
  */
 const TRANSLATIONS = {
@@ -52,6 +60,8 @@ const TRANSLATIONS = {
     victory: 'VICTOIRE',
     moves: 'Coups',
     time: 'Temps',
+    best: 'Record',
+    none: 'Aucun',
     secretMsg: 'Message Secret',
     continueBtn: 'Continuer',
     invalidImg: "Format d'image invalide.",
@@ -80,6 +90,8 @@ const TRANSLATIONS = {
     victory: 'VICTORY',
     moves: 'Moves',
     time: 'Time',
+    best: 'Best',
+    none: 'None',
     secretMsg: 'Secret Message',
     continueBtn: 'Continue',
     invalidImg: 'Invalid image format.',
@@ -123,7 +135,16 @@ export default function App() {
   const [userName, setUserName] = useState('Player');
   const [theme, setTheme] = useState('dark');
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const [lang, setLang] = useState(() => localStorage.getItem('lumina_lang') || 'fr');
+  const [lang, setLang] = useState(() => {
+    const saved = localStorage.getItem('lumina_lang');
+    if (saved) return saved;
+    // Auto-detect browser language
+    const browserLang = navigator.language.split('-')[0];
+    return ['en', 'fr'].includes(browserLang) ? browserLang : 'fr';
+  });
+
+  // Records State
+  const [records, setRecords] = useState({}); // { '3': { time: 10, moves: 20 }, ... }
 
   // i18n helper
   const t = (key) => TRANSLATIONS[lang][key] || key;
@@ -133,11 +154,29 @@ export default function App() {
     localStorage.setItem('lumina_lang', lang);
   }, [lang]);
 
-  // Load custom gallery on mount for persistent offline storage
+  // Load custom gallery and records on mount
   useEffect(() => {
     localforage.getItem('lumina_custom_gallery').then((data) => {
       if (data && Array.isArray(data)) setCustomGallery(data);
     });
+    localforage.getItem('lumina_records').then((data) => {
+      if (data) setRecords(data);
+    });
+  }, []);
+
+  const playSfx = useCallback((type) => {
+    if (!soundEnabled) return;
+    const sound = SFX[type];
+    if (sound) {
+      sound.currentTime = 0;
+      sound.play().catch(() => {}); // Browser policy might block initial play
+    }
+  }, [soundEnabled]);
+
+  const triggerHaptic = useCallback(() => {
+    if (window.navigator.vibrate) {
+      window.navigator.vibrate(10);
+    }
   }, []);
 
   // Shuffle Logic MUST be defined before it's used in initial effect
@@ -279,11 +318,32 @@ export default function App() {
       [newTiles[emptyIdx], newTiles[idx]] = [newTiles[idx], newTiles[emptyIdx]];
       setTiles(newTiles);
       setMoves((m) => m + 1);
+      playSfx('slide');
+      triggerHaptic();
 
       // Check Win Condition
       if (newTiles.every((v, i) => v === i)) {
         setIsSolved(true);
         setIsPlaying(false);
+        playSfx('victory');
+        
+        // Update Personal Records
+        const lvlStr = gridSize.toString();
+        const currentBest = records[lvlStr];
+        const isBetterTime = !currentBest || time < currentBest.time;
+        const isBetterMoves = !currentBest || (moves + 1) < currentBest.moves;
+
+        if (isBetterTime || isBetterMoves) {
+            const newRecords = {
+                ...records,
+                [lvlStr]: {
+                    time: isBetterTime ? time : currentBest.time,
+                    moves: isBetterMoves ? moves + 1 : currentBest.moves
+                }
+            };
+            setRecords(newRecords);
+            localforage.setItem('lumina_records', newRecords);
+        }
       }
     }
   };
@@ -450,6 +510,11 @@ export default function App() {
         {/* Victory Overlay Modal */}
         {isSolved && (
           <div className="victory-modal">
+            {/* Visual Celebration Particles */}
+            <div className="celebration-container">
+              {[...Array(12)].map((_, i) => <div key={i} className="particle" style={{ '--delay': `${i * 0.1}s`, '--x': `${(i - 6) * 30}px` }} />)}
+            </div>
+
             <h1 className="brand-logo" style={{ fontSize: '2.5rem', marginBottom: 10 }}>{t('victory')}</h1>
             <p style={{ color: 'var(--text-muted)' }}>{t('moves')}: {moves} | {t('time')}: {formatTime(time)}</p>
 
@@ -538,7 +603,21 @@ export default function App() {
               </label>
             </div>
 
-            <div style={{ background: 'var(--glass-bg)', padding: '20px', borderRadius: '16px', border: '1px solid var(--glass-border)', marginTop: 12 }}>
+            {/* Display Personal Records */}
+            <div style={{ marginTop: 24 }}>
+              <h3 style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: 12, textTransform: 'uppercase' }}>{t('best')}</h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+                {[3, 4, 5].map(lvl => (
+                  <div key={lvl} style={{ background: 'var(--bg-secondary)', padding: 12, borderRadius: 12, textAlign: 'center', border: '1px solid var(--glass-border)' }}>
+                    <div style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--accent-blue)' }}>{lvl}x{lvl}</div>
+                    <div style={{ fontSize: '0.9rem', fontWeight: 900 }}>{records[lvl] ? formatTime(records[lvl].time) : t('none')}</div>
+                    <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{records[lvl] ? records[lvl].moves : '-'} pts</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ background: 'var(--glass-bg)', padding: '20px', borderRadius: '16px', border: '1px solid var(--glass-border)', marginTop: 24 }}>
               <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-muted)', marginBottom: 8 }}>{t('dev')}</div>
               <div style={{ fontWeight: 900, fontSize: '1.2rem', color: 'var(--accent-blue)', marginBottom: 4 }}>Elodie ATANA</div>
               <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: 20 }}>Ingénieure IA & Lead Architect. Fondatrice de Codorah.</p>
