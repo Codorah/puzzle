@@ -127,7 +127,7 @@ header {
   display: grid;
   grid-template-columns: repeat(var(--grid-size, 3), 1fr);
   width: var(--max-board-size);
-  height: calc(var(--max-board-size) / var(--image-ratio, 1));
+  aspect-ratio: var(--image-ratio, 1);
   max-height: 60vh;
   max-width: 90vw;
   gap: 2px;
@@ -136,20 +136,30 @@ header {
   overflow: hidden;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
   transition: var(--transition-smooth);
+  position: relative;
 }
 
 .tile {
   width: 100%;
   height: 100%;
+  aspect-ratio: 1; /* Force square unless board ratio changes */
   cursor: pointer;
   background-size: calc(100% * var(--grid-size)) calc(100% * var(--grid-size));
   transition: transform 0.1s ease-out;
   position: relative;
 }
 
-.tile:active { transform: scale(0.96); z-index: 5; }
-
-.tile.empty { background: transparent !important; }
+.mini-modal {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
 
 .tile-hint {
   position: absolute;
@@ -221,22 +231,25 @@ header {
   position: fixed;
   inset: 0;
   z-index: 1000;
-  background: rgba(0,0,0,0.8);
-  backdrop-filter: blur(10px);
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(15px);
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  padding: var(--spacing-md);
 }
 
 .modal-content {
   width: 100%;
   max-width: 500px;
+  max-height: 92vh; /* Ensure it never leaves the screen */
   background: var(--panel-bg);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-xl) var(--radius-xl) 0 0;
   padding: var(--spacing-lg);
-  box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+  box-shadow: 0 -20px 60px rgba(0,0,0,0.8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
   animation: slideUp 0.4s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
@@ -246,9 +259,11 @@ header {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--spacing-sm);
-  max-height: 50vh;
   overflow-y: auto;
   padding: var(--spacing-sm);
+  flex-grow: 1; /* Take up all space */
+  border-radius: var(--radius-md);
+  background: rgba(0,0,0,0.1);
 }
 
 .gallery-card {

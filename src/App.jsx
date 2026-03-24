@@ -189,7 +189,11 @@ export default function App() {
 
         <main className="game-area">
           <div className="board-wrapper">
-            <div className="board" style={{ gridTemplateColumns: `repeat(var(--grid-size), 1fr)` }}>
+            <div className="board" style={{ 
+              gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
+              '--grid-size': gridSize,
+              '--image-ratio': aspectRatio
+            }}>
               {tiles.map((v, i) => {
                 const isEmpty = v === TILE_COUNT - 1;
                 const x = v % gridSize, y = Math.floor(v / gridSize);
@@ -201,11 +205,11 @@ export default function App() {
                 );
               })}
               {showLevelSelect && (
-                <div className="mini-modal glass">
-                   <div style={{display:'flex', flexDirection:'column', gap: 8, width: '100%'}}>
-                      <button className="control-btn btn-main-alt" style={{width:'100%', height:'50px'}} onClick={() => shuffle(3)}>{t('easy')} 3x3</button>
-                      <button className="control-btn btn-main-alt" style={{width:'100%', height:'50px'}} onClick={() => shuffle(4)}>{t('medium')} 4x4</button>
-                      <button className="control-btn btn-main-alt" style={{width:'100%', height:'50px'}} onClick={() => shuffle(5)}>{t('hard')} 5x5</button>
+                <div className="mini-modal">
+                   <div style={{display:'flex', flexDirection:'column', gap: 12, width: '100%'}}>
+                      <button className="control-btn btn-main-alt" style={{width:'100%', height:'60px'}} onClick={() => shuffle(3)}>{t('easy')} 3x3</button>
+                      <button className="control-btn btn-main-alt" style={{width:'100%', height:'60px'}} onClick={() => shuffle(4)}>{t('medium')} 4x4</button>
+                      <button className="control-btn btn-main-alt" style={{width:'100%', height:'60px'}} onClick={() => shuffle(5)}>{t('hard')} 5x5</button>
                    </div>
                 </div>
               )}
