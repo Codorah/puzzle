@@ -60,6 +60,42 @@ export default function App() {
   const [theme, setTheme] = useState('dark');
   const [soundEnabled, setSoundEnabled] = useState(true);
 
+  // Shuffle Logic MUST be defined before it's used in initial effect
+  const handleShuffle = useCallback((targetLevel) => {
+    if (!targetLevel) {
+      setView('level');
+      return;
+    }
+
+    setView('board');
+    setGridSize(targetLevel);
+
+    setTimeout(() => {
+      let newTiles = [...Array(targetLevel * targetLevel).keys()];
+      // Make 300 random valid moves to ensure solvability
+      for (let i = 0; i < 300; i++) {
+        const emptyIdx = newTiles.indexOf(targetLevel * targetLevel - 1);
+        const r = Math.floor(emptyIdx / targetLevel);
+        const c = emptyIdx % targetLevel;
+        const valid = [];
+
+        if (r > 0) valid.push(emptyIdx - targetLevel);
+        if (r < targetLevel - 1) valid.push(emptyIdx + targetLevel);
+        if (c > 0) valid.push(emptyIdx - 1);
+        if (c < targetLevel - 1) valid.push(emptyIdx + 1);
+
+        const move = valid[Math.floor(Math.random() * valid.length)];
+        [newTiles[emptyIdx], newTiles[move]] = [newTiles[move], newTiles[emptyIdx]];
+      }
+      setTiles(newTiles);
+      setIsSolved(false);
+      setMoves(0);
+      setTime(0);
+      setIsPlaying(true);
+      setIsPreviewMode(false);
+    }, 50);
+  }, []);
+
   // Initial URL parsing
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -71,9 +107,15 @@ export default function App() {
     if (imgIdx && DEFAULT_GALLERY[imgIdx]) setImage(DEFAULT_GALLERY[imgIdx]);
     else if (imgIdx === 'custom') setImage(DEFAULT_GALLERY[0]);
 
-    if (level && [3, 4, 5].includes(level)) setGridSize(level);
-    setTimeout(() => setIsReady(true), 1500);
-  }, []);
+    const initialLevel = (level && [3, 4, 5].includes(level)) ? level : 3;
+    if (initialLevel !== 3) setGridSize(initialLevel);
+
+    setTimeout(() => {
+      setIsReady(true);
+      // Auto-shuffle if a message was shared so the user can play immediately
+      if (msg) handleShuffle(initialLevel); 
+    }, 1500);
+  }, [handleShuffle]);
 
   // Theme Sync
   useEffect(() => {
@@ -135,42 +177,6 @@ export default function App() {
     }
     return () => clearInterval(interval);
   }, [isPlaying, isSolved]);
-
-  // Shuffle Logic
-  const handleShuffle = (targetLevel) => {
-    if (!targetLevel) {
-      setView('level');
-      return;
-    }
-
-    setView('board');
-    setGridSize(targetLevel);
-
-    setTimeout(() => {
-      let newTiles = [...Array(targetLevel * targetLevel).keys()];
-      // Make 300 random valid moves to ensure solvability
-      for (let i = 0; i < 300; i++) {
-        const emptyIdx = newTiles.indexOf(targetLevel * targetLevel - 1);
-        const r = Math.floor(emptyIdx / targetLevel);
-        const c = emptyIdx % targetLevel;
-        const valid = [];
-
-        if (r > 0) valid.push(emptyIdx - targetLevel);
-        if (r < targetLevel - 1) valid.push(emptyIdx + targetLevel);
-        if (c > 0) valid.push(emptyIdx - 1);
-        if (c < targetLevel - 1) valid.push(emptyIdx + 1);
-
-        const move = valid[Math.floor(Math.random() * valid.length)];
-        [newTiles[emptyIdx], newTiles[move]] = [newTiles[move], newTiles[emptyIdx]];
-      }
-      setTiles(newTiles);
-      setIsSolved(false);
-      setMoves(0);
-      setTime(0);
-      setIsPlaying(true);
-      setIsPreviewMode(false);
-    }, 50);
-  };
 
   // Move Logic
   const handleTileClick = (idx) => {
@@ -394,7 +400,7 @@ export default function App() {
               <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: 20 }}>Ingénieure IA & Lead Architect. Fondatrice de Codorah.</p>
 
               <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-                <a className="social-pill" href="www.linkedin.com/in/codorah" target="_blank" rel="noopener noreferrer"><Icons.LinkedIn /> LinkedIn</a>
+                <a className="social-pill" href="https://linkedin.com/in/codorah" target="_blank" rel="noopener noreferrer"><Icons.LinkedIn /> LinkedIn</a>
                 <a className="social-pill" href="https://portfolio-js-elodie.vercel.app/" target="_blank" rel="noopener noreferrer"><Icons.Globe /> Portfolio</a>
                 <a className="social-pill" href="https://github.com/Codorah" target="_blank" rel="noopener noreferrer"><Icons.Github /> GitHub</a>
                 <a className="social-pill" href="mailto:codorah@hotmail.com"><Icons.Mail /> Mail</a>
