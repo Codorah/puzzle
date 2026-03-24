@@ -160,6 +160,7 @@ export default function App() {
     bg: new Audio(AUDIO_URLS.bg)
   });
   const [audioUnlocked, setAudioUnlocked] = useState(false);
+  const initialParams = useRef({ level: 3, hasMsg: false });
 
   // i18n helper
   const t = (key) => TRANSLATIONS[lang][key] || key;
@@ -209,7 +210,12 @@ export default function App() {
     });
     
     setAudioUnlocked(true);
-  }, [audioUnlocked]);
+    
+    // If we have a shared mystery message, start it now that audio is ready
+    if (initialParams.current.hasMsg) {
+      handleShuffle(initialParams.current.level);
+    }
+  }, [audioUnlocked, handleShuffle]);
 
   const playSfx = useCallback((type) => {
     if (!soundEnabled || !audioUnlocked) return;
@@ -281,6 +287,8 @@ export default function App() {
 
     const initialLevel = (level && [3, 4, 5].includes(level)) ? level : 3;
     if (initialLevel !== 3) setGridSize(initialLevel);
+
+    initialParams.current = { level: initialLevel, hasMsg: !!msg };
 
     setTimeout(() => {
       setIsReady(true);
