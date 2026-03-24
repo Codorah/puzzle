@@ -6,14 +6,18 @@ import './index.css';
  */
 const Icons = {
   Gallery: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>,
-  Settings: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>,
+  Settings: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1-1-1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>,
   Shuffle: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>,
   Hint: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>,
   Preview: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>,
   Share: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>,
   Upload: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>,
   Close: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>,
-  Copy: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+  Copy: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>,
+  LinkedIn: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>,
+  Mail: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>,
+  Globe: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>,
+  Github: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
 };
 
 const DEFAULT_GALLERY = [
@@ -26,7 +30,6 @@ export default function App() {
   // Gameplay State
   const [gridSize, setGridSize] = useState(3);
   const [image, setImage] = useState('/gallery/puzzle-4.png');
-  const [aspectRatio, setAspectRatio] = useState(1);
   const TILE_COUNT = gridSize * gridSize;
   const [tiles, setTiles] = useState([...Array(TILE_COUNT).keys()]);
   
@@ -37,9 +40,13 @@ export default function App() {
   const [moves, setMoves] = useState(0);
   const [time, setTime] = useState(0);
   
+  // Custom Overlays State
+  const [showSettings, setShowSettings] = useState(false);
+  const [isPreviewMode, setIsPreviewMode] = useState(false);
+  
   // Feature State
   const [showHints, setShowHints] = useState(false);
-  const [view, setView] = useState('board'); // 'board' | 'gallery' | 'settings' | 'level' | 'preview'
+  const [view, setView] = useState('board'); // 'board' | 'gallery' | 'level'
   const [loadedImages, setLoadedImages] = useState({});
   const [croppedImage, setCroppedImage] = useState(null); // The perfectly squared image
   const fileInputRef = useRef(null);
@@ -117,6 +124,7 @@ export default function App() {
     setIsPlaying(false);
     setMoves(0);
     setTime(0);
+    setIsPreviewMode(false);
   }, [gridSize]);
 
   // Timer loop
@@ -160,12 +168,13 @@ export default function App() {
       setMoves(0);
       setTime(0);
       setIsPlaying(true);
+      setIsPreviewMode(false);
     }, 50);
   };
 
   // Move Logic
   const handleTileClick = (idx) => {
-    if (isSolved || !isPlaying) return;
+    if (isSolved || !isPlaying || isPreviewMode) return;
     
     const emptyIdx = tiles.indexOf(TILE_COUNT - 1);
     const r = Math.floor(idx / gridSize);
@@ -258,7 +267,7 @@ export default function App() {
         )}
         
         <div className="header-actions">
-          <button className="btn-icon-labeled" style={{minWidth: 'auto', padding: '8px'}} onClick={() => setView('settings')} aria-label="Paramètres">
+          <button className="btn-icon-labeled" style={{minWidth: 'auto', padding: '8px'}} onClick={() => setShowSettings(true)} aria-label="Paramètres">
             <Icons.Settings />
           </button>
           <button className="btn-icon-labeled" style={{minWidth: 'auto', padding: '8px'}} onClick={handleShare} aria-label="Partager">
@@ -277,6 +286,12 @@ export default function App() {
             '--grid-size': gridSize
           }}
         >
+          {/* Seamless In-Game Preview Crossfade */}
+          <div 
+            className={`preview-overlay ${isPreviewMode ? 'active' : ''}`} 
+            style={{ backgroundImage: `url(${croppedImage || image})` }} 
+          />
+          
           {tiles.map((v, i) => {
             const isEmpty = v === TILE_COUNT - 1;
             const x = v % gridSize;
@@ -330,7 +345,8 @@ export default function App() {
           <Icons.Hint />
           <span>Indices</span>
         </button>
-        <button className="btn-icon-labeled" onClick={() => setView('preview')}>
+        {/* New Preview Toggle Button */}
+        <button className={`btn-icon-labeled ${isPreviewMode ? 'active' : ''}`} onClick={() => setIsPreviewMode(!isPreviewMode)}>
           <Icons.Preview />
           <span>Aperçu</span>
         </button>
@@ -340,43 +356,66 @@ export default function App() {
         </button>
       </footer>
 
-      {/* Modals & Overlays (Bottom Sheets) */}
+      {/* Premium Glass Settings Modal */}
+      <div className={`glass-modal-overlay ${showSettings ? 'open' : ''}`} onClick={() => setShowSettings(false)}>
+        <div className="glass-modal" onClick={e => e.stopPropagation()}>
+          <div className="sheet-header" style={{ marginBottom: 20 }}>
+            <h2>Paramètres</h2>
+            <button className="btn-icon-labeled" style={{minWidth:'auto', padding:4}} onClick={() => setShowSettings(false)}>
+              <Icons.Close />
+            </button>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div className="settings-section" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 8 }}>
+              <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Pseudo de Partage</label>
+              <input type="text" value={userName} onChange={(e) => setUserName(e.target.value)} className="input-premium" placeholder="Votre nom..." />
+            </div>
+            
+            <div className="settings-section">
+              <span style={{fontWeight: 600}}>Thème Sombre</span>
+              <label className="toggle-switch">
+                <input type="checkbox" checked={theme === 'dark'} onChange={() => setTheme(theme === 'dark' ? 'light' : 'dark')} />
+                <span className="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div className="settings-section">
+              <span style={{fontWeight: 600}}>Effets Sonores</span>
+              <label className="toggle-switch">
+                <input type="checkbox" checked={soundEnabled} onChange={() => setSoundEnabled(!soundEnabled)} />
+                <span className="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div style={{background: 'var(--glass-bg)', padding: '20px', borderRadius: '16px', border: '1px solid var(--glass-border)', marginTop: 12}}>
+              <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-muted)', marginBottom: 8}}>Développeur</div>
+              <div style={{ fontWeight: 900, fontSize: '1.2rem', color: 'var(--accent-blue)', marginBottom: 4 }}>Elodie ATANA</div>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: 20 }}>Ingénieure IA & Lead Architect. Fondatrice de Codorah.</p>
+              
+              <div style={{display: 'flex', gap: 10, flexWrap: 'wrap'}}>
+                <a className="social-pill" href="https://linkedin.com/in/elodieatana" target="_blank" rel="noopener noreferrer"><Icons.LinkedIn /> LinkedIn</a>
+                <a className="social-pill" href="https://codorah.com" target="_blank" rel="noopener noreferrer"><Icons.Globe /> Portfolio</a>
+                <a className="social-pill" href="https://github.com/Codorah" target="_blank" rel="noopener noreferrer"><Icons.Github /> GitHub</a>
+                <a className="social-pill" href="mailto:elodie@codorah.com"><Icons.Mail /> Mail</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Modals & Overlays (Bottom Sheets for Gallery and Level) */}
       <div className={`sheet-overlay ${view !== 'board' ? 'open' : ''}`} onClick={() => setView('board')}>
         <div className="sheet-content" onClick={(e) => e.stopPropagation()}>
           
           <div className="sheet-header">
-            <h2>{view === 'gallery' ? 'Galerie' : view === 'level' ? 'Difficulté' : view === 'settings' ? 'Paramètres' : 'Aperçu'}</h2>
+            <h2>{view === 'gallery' ? 'Galerie' : 'Difficulté'}</h2>
             <button className="btn-icon-labeled" style={{minWidth:'auto', padding:4}} onClick={() => setView('board')}>
               <Icons.Close />
             </button>
           </div>
 
           <div className="scroll-area">
-            {/* Settings View */}
-            {view === 'settings' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Pseudo de Partage</label>
-                  <input type="text" value={userName} onChange={(e) => setUserName(e.target.value)} className="input-premium" placeholder="Votre nom..." />
-                </div>
-                
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                  <button className="btn-secondary" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
-                    Thème: {theme === 'dark' ? 'Sombre' : 'Clair'}
-                  </button>
-                  <button className="btn-secondary" onClick={() => setSoundEnabled(!soundEnabled)}>
-                    Son: {soundEnabled ? 'Activé' : 'Coupé'}
-                  </button>
-                </div>
-
-                <div style={{background: 'var(--glass-bg)', padding: 16, borderRadius: 16, border: '1px solid var(--glass-border)'}}>
-                  <div style={{ fontWeight: 800, color: 'var(--accent-blue)', marginBottom: 4 }}>Elodie ATANA</div>
-                  <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: 12 }}>Ingénieure IA & Prompt Engineer. Fondatrice de Codorah.</p>
-                  <a className="btn-secondary" style={{display: 'inline-block', width: '100%', textAlign: 'center', textDecoration: 'none', padding: '10px'}} href="https://github.com/Codorah" target="_blank" rel="noopener noreferrer">Voir le profil GitHub</a>
-                </div>
-              </div>
-            )}
-
             {/* Gallery View */}
             {view === 'gallery' && (
               <div className="gallery-grid">
@@ -411,15 +450,7 @@ export default function App() {
                  <button className="btn-secondary" onClick={() => handleShuffle(5)}>Difficile (5x5)</button>
               </div>
             )}
-
-            {/* Preview View */}
-            {view === 'preview' && (
-              <div style={{ display: 'flex', justifyContent: 'center', background: 'var(--bg-secondary)', borderRadius: '16px', padding: '16px' }}>
-                 <img src={image} style={{ maxWidth: '100%', maxHeight: '50vh', objectFit: 'contain', borderRadius: '8px' }} alt="Preview full" />
-              </div>
-            )}
           </div>
-
         </div>
       </div>
     </div>
