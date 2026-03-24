@@ -33,15 +33,15 @@
 }
 
 /* Light Theme Output */
-body.light-theme {
-  --bg-primary: #f8fafc;
+:root[data-theme="light"] {
+  --bg-primary: #f1f5f9;
   --bg-secondary: #ffffff;
   --accent-blue: #2563eb;
   --text-primary: #0f172a;
   --text-muted: #64748b;
-  --glass-border: rgba(0, 0, 0, 0.1);
-  --glass-bg: rgba(255, 255, 255, 0.8);
-  --modal-overlay: rgba(248, 250, 252, 0.85);
+  --glass-border: rgba(0, 0, 0, 0.15);
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --modal-overlay: rgba(241, 245, 249, 0.85);
 }
 
 /* Base Reset & Typography */
@@ -114,20 +114,44 @@ body {
   overflow: hidden; /* Ensure board doesn't break out */
 }
 
-/* The Board - Adaptive Aspect Ratio */
+/* Splash Screen */
+.splash-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeOut 0.5s ease-out 1.2s forwards;
+}
+
+.splash-screen .brand-logo {
+  font-size: 3.5rem;
+  animation: pulse 1s ease-in-out infinite;
+  text-shadow: 0 0 40px rgba(59, 130, 246, 0.8);
+}
+
+@keyframes fadeOut {
+  to { opacity: 0; visibility: hidden; }
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* The Board - Perfect Square Ratio */
 .puzzle-board {
   display: grid;
-  /* Columns set dynamically via style prop */
   width: 100%;
   max-width: var(--max-board-size);
-  /* The core trick for perfect mobile fit: bound by height to leave room for toolbars */
+  aspect-ratio: 1 / 1;
   max-height: calc(100vh - var(--header-height) - var(--toolbar-height) - 40px);
   background: var(--bg-secondary);
   border-radius: var(--radius-md);
   overflow: hidden;
   box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.8), 0 0 0 1px var(--glass-border);
   position: relative;
-  /* aspect-ratio set dynamically via style based on image */
 }
 
 .tile {

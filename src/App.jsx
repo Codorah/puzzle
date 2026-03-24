@@ -33,6 +33,7 @@ export default function App() {
   // Progress State
   const [isPlaying, setIsPlaying] = useState(false);
   const [isSolved, setIsSolved] = useState(false);
+  const [isReady, setIsReady] = useState(false); // Splash screen state
   const [moves, setMoves] = useState(0);
   const [time, setTime] = useState(0);
   
@@ -40,6 +41,7 @@ export default function App() {
   const [showHints, setShowHints] = useState(false);
   const [view, setView] = useState('board'); // 'board' | 'gallery' | 'settings' | 'level' | 'preview'
   const [loadedImages, setLoadedImages] = useState({});
+  const [croppedImage, setCroppedImage] = useState(null); // The perfectly squared image
   const fileInputRef = useRef(null);
 
   // Mystery Message State
@@ -58,36 +60,43 @@ export default function App() {
     const imgIdx = params.get('img');
     const level = parseInt(params.get('lvl'));
     
-    // Decode UTF-8 Base64 securely
-    if (msg) {
-      try {
-        setSecretMessage(decodeURIComponent(escape(window.atob(msg))));
-      } catch (e) {
-        console.error("Invalid mystery message encoding.");
-      }
-    }
+    if (msg) try { setSecretMessage(decodeURIComponent(escape(window.atob(msg)))); } catch (e) {}
+    if (imgIdx && DEFAULT_GALLERY[imgIdx]) setImage(DEFAULT_GALLERY[imgIdx]);
+    else if (imgIdx === 'custom') setImage(DEFAULT_GALLERY[0]);
     
-    if (imgIdx && DEFAULT_GALLERY[imgIdx]) {
-      setImage(DEFAULT_GALLERY[imgIdx]);
-    } else if (imgIdx === 'custom') {
-      // Custom images via URL are not supported without a backend, 
-      // but we gracefully fallback to default.
-      setImage(DEFAULT_GALLERY[0]);
-    }
-    
-    if (level && [3, 4, 5].includes(level)) {
-      setGridSize(level);
-    }
+    if (level && [3, 4, 5].includes(level)) setGridSize(level);
+    setTimeout(() => setIsReady(true), 1500);
   }, []);
 
-  // Image Aspect Ratio Calculation
+  // Theme Sync
   useEffect(() => {
-    const img = new Image();
-    img.src = image;
-    img.onload = () => {
-      // Calculate true aspect ratio to prevent distortion
-      setAspectRatio(img.width / img.height);
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
+
+  // Image Aspect Ratio Calculation -> Replaced by True Square Cropping
+  useEffect(() => {
+    let isMounted = true;
+    const cropToSquare = (url) => {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.src = url;
+      img.onload = () => {
+        if (!isMounted) return;
+        const size = Math.min(img.width, img.height);
+        const startX = (img.width - size) / 2;
+        const startY = (img.height - size) / 2;
+        
+        const canvas = document.createElement('canvas');
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, startX, startY, size, size, 0, 0, size, size);
+        setCroppedImage(canvas.toDataURL('image/jpeg', 0.9));
+      };
+      img.onerror = () => { if(isMounted) setCroppedImage(url); }
     };
+    cropToSquare(image);
+    return () => { isMounted = false; };
   }, [image]);
 
   // Reset board on grid size change
@@ -210,6 +219,15 @@ export default function App() {
 
   return (
     <div className="app-shell">
+      {/* 0. Splash Screen */}
+      {!isReady && (
+        <div className="splash-screen">
+          <div className="brand-logo">
+            <span className="brand-col-1">LU</span><span className="brand-col-2">MINA</span>
+          </div>
+        </div>
+      )}
+
       {/* 1. Header Area */}
       <header className="app-header">
         <div className="brand-logo">
@@ -245,14 +263,14 @@ export default function App() {
           className="puzzle-board" 
           style={{ 
             gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
-            '--grid-size': gridSize,
-            aspectRatio: aspectRatio // Crucial feature: prevents any image stretching
+            '--grid-size': gridSize
           }}
         >
           {tiles.map((v, i) => {
             const isEmpty = v === TILE_COUNT - 1;
             const x = v % gridSize;
             const y = Math.floor(v / gridSize);
+            const bgImageSrc = croppedImage || image;
             
             return (
               <div 
@@ -260,7 +278,7 @@ export default function App() {
                 className={`tile ${isEmpty ? 'empty' : ''}`} 
                 onClick={() => handleTileClick(i)} 
                 style={!isEmpty ? {
-                  backgroundImage: `url(${image})`,
+                  backgroundImage: `url(${bgImageSrc})`,
                   backgroundPosition: `${(x / (gridSize - 1)) * 100}% ${(y / (gridSize - 1)) * 100}%`,
                 } : {}}
               >
@@ -342,7 +360,8 @@ export default function App() {
 
                 <div style={{background: 'var(--glass-bg)', padding: 16, borderRadius: 16, border: '1px solid var(--glass-border)'}}>
                   <div style={{ fontWeight: 800, color: 'var(--accent-blue)', marginBottom: 4 }}>Elodie ATANA</div>
-                  <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Ingénieure IA & Prompt Engineer. Fondatrice de Codorah.</p>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: 12 }}>Ingénieure IA & Prompt Engineer. Fondatrice de Codorah.</p>
+                  <a className="btn-secondary" style={{display: 'inline-block', width: '100%', textAlign: 'center', textDecoration: 'none', padding: '10px'}} href="https://github.com/Codorah" target="_blank" rel="noopener noreferrer">Voir le profil GitHub</a>
                 </div>
               </div>
             )}
