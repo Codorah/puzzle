@@ -213,19 +213,14 @@ export default function App() {
               )}
             </div>
           </div>
+
           <div className="stats-bar">
             <div className="stat-item"><span className="stat-label">{t('moves')}</span><span className="stat-value">{moves}</span></div>
             <div className="stat-item"><span className="stat-label">{t('time')}</span><span className="stat-value">{formatTime(time)}</span></div>
           </div>
-          <div className="action-bar" style={{display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:8, width:'100%'}}>
-            <button className="btn-icon-labeled btn-main-alt" onClick={() => shuffle()}><Icons.Shuffle /><span>{t('shuffle')}</span></button>
-            <button className={`btn-icon-labeled ${showHints ? 'active' : ''}`} onClick={() => setShowHints(!showHints)}><Icons.Hint /><span>{t('hints')}</span></button>
-            <button className="btn-icon-labeled" onClick={() => setShowPreview(true)}><Icons.Preview /><span>{t('preview')}</span></button>
-            <button className="btn-icon-labeled" onClick={handleShare}><Icons.Share /><span>{t('share')}</span></button>
-          </div>
-
+          
           {isSolved && (
-            <div className="win-overlay-v2 glass">
+            <div className="win-overlay-v2">
                <div className="win-badge">✓</div><div className="win-title">{t('win')}</div>
                <div className="win-stats"><div>{moves} {t('moves')}</div><div>{formatTime(time)}</div></div>
                {(secretMessage || messageInput) && (
@@ -235,6 +230,13 @@ export default function App() {
             </div>
           )}
         </main>
+
+        <div className="action-bar">
+          <button className="btn-icon-labeled btn-main-alt" onClick={() => shuffle()}><Icons.Shuffle /><span>{t('shuffle')}</span></button>
+          <button className={`btn-icon-labeled ${showHints ? 'active' : ''}`} onClick={() => setShowHints(!showHints)}><Icons.Hint /><span>{t('hints')}</span></button>
+          <button className="btn-icon-labeled" onClick={() => setShowPreview(true)}><Icons.Preview /><span>{t('preview')}</span></button>
+          <button className="btn-icon-labeled" onClick={handleShare}><Icons.Share /><span>{t('share')}</span></button>
+        </div>
       </div>
 
       {(view !== 'board' || showPreview) && (
