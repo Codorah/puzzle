@@ -176,14 +176,14 @@ export default function App() {
         <header>
           <div className="logo-text">LU<span>MINA</span></div>
           <div style={{ display: 'flex', gap: 12 }}>
-            <button className="btn-icon-labeled" onClick={() => setView('gallery')}><Icons.Gallery /><span>{t('gallery')}</span></button>
-            <button className="btn-icon-labeled" onClick={() => setView('settings')}><Icons.Settings /><span>{t('settings')}</span></button>
+            <button className="control-btn" onClick={() => setView('gallery')}><Icons.Gallery /><span>{t('gallery')}</span></button>
+            <button className="control-btn" onClick={() => setView('settings')}><Icons.Settings /><span>{t('settings')}</span></button>
           </div>
         </header>
 
         {!secretMessage && (
           <div className="msg-bar">
-            <input type="text" maxLength="100" placeholder={t('writeMsg')} value={messageInput} onChange={(e) => setMessageInput(e.target.value)} />
+            <input type="text" maxLength="100" placeholder={t('writeMsg')} value={messageInput} onChange={(e) => setMessageInput(e.target.value)} aria-label="Mystery Message" />
           </div>
         )}
 
@@ -196,18 +196,16 @@ export default function App() {
                 return (
                   <div key={i} className={`tile ${isEmpty ? 'empty' : ''}`} onClick={() => handleTileClick(i)} style={!isEmpty ? {
                         backgroundImage: `url(${image})`,
-                        backgroundSize: `calc(100% * var(--grid-size)) calc(100% * var(--grid-size))`,
                         backgroundPosition: `${(x / (gridSize - 1)) * 100}% ${(y / (gridSize - 1)) * 100}%`,
-                        position: 'relative'
                       } : {}}>{showHints && !isEmpty && <span className="tile-hint">{v + 1}</span>}</div>
                 );
               })}
               {showLevelSelect && (
                 <div className="mini-modal glass">
                    <div style={{display:'flex', flexDirection:'column', gap: 8, width: '100%'}}>
-                      <button className="btn-icon-labeled btn-main-alt" style={{width:'100%', height:'45px'}} onClick={() => shuffle(3)}>{t('easy')} 3x3</button>
-                      <button className="btn-icon-labeled btn-main-alt" style={{width:'100%', height:'45px'}} onClick={() => shuffle(4)}>{t('medium')} 4x4</button>
-                      <button className="btn-icon-labeled btn-main-alt" style={{width:'100%', height:'45px'}} onClick={() => shuffle(5)}>{t('hard')} 5x5</button>
+                      <button className="control-btn btn-main-alt" style={{width:'100%', height:'50px'}} onClick={() => shuffle(3)}>{t('easy')} 3x3</button>
+                      <button className="control-btn btn-main-alt" style={{width:'100%', height:'50px'}} onClick={() => shuffle(4)}>{t('medium')} 4x4</button>
+                      <button className="control-btn btn-main-alt" style={{width:'100%', height:'50px'}} onClick={() => shuffle(5)}>{t('hard')} 5x5</button>
                    </div>
                 </div>
               )}
@@ -224,18 +222,18 @@ export default function App() {
                <div className="win-badge">✓</div><div className="win-title">{t('win')}</div>
                <div className="win-stats"><div>{moves} {t('moves')}</div><div>{formatTime(time)}</div></div>
                {(secretMessage || messageInput) && (
-                 <div className="mystery-box"><label>MESSAGE MYSTÈRE</label><div className="secret-reveal">{secretMessage || messageInput}</div></div>
+                 <div className="mystery-box"><label>MESSAGE MYSTÈRE</label><div className="secret-reveal" style={{color: 'var(--accent-primary)', fontWeight: 900, fontSize: '1.2rem', marginTop: 10, background: 'rgba(0,0,0,0.5)', padding: 10, borderRadius: 10}}>{secretMessage || messageInput}</div></div>
                )}
-               <button className="btn-premium btn-main" style={{marginTop: 20, width: '100%', height: 50}} onClick={() => setIsSolved(false)}>{t('back')}</button>
+               <button className="control-btn btn-main" style={{marginTop: 20, width: '100%', height: 55}} onClick={() => setIsSolved(false)}>{t('back')}</button>
             </div>
           )}
         </main>
 
         <div className="action-bar">
-          <button className="btn-icon-labeled btn-main-alt" onClick={() => shuffle()}><Icons.Shuffle /><span>{t('shuffle')}</span></button>
-          <button className={`btn-icon-labeled ${showHints ? 'active' : ''}`} onClick={() => setShowHints(!showHints)}><Icons.Hint /><span>{t('hints')}</span></button>
-          <button className="btn-icon-labeled" onClick={() => setShowPreview(true)}><Icons.Preview /><span>{t('preview')}</span></button>
-          <button className="btn-icon-labeled" onClick={handleShare}><Icons.Share /><span>{t('share')}</span></button>
+          <button className="control-btn btn-main-alt" onClick={() => shuffle()}><Icons.Shuffle /><span>{t('shuffle')}</span></button>
+          <button className={`control-btn ${showHints ? 'active' : ''}`} onClick={() => setShowHints(!showHints)}><Icons.Hint /><span>{t('hints')}</span></button>
+          <button className="control-btn" onClick={() => setShowPreview(true)}><Icons.Preview /><span>{t('preview')}</span></button>
+          <button className="control-btn" onClick={handleShare}><Icons.Share /><span>{t('share')}</span></button>
         </div>
       </div>
 
@@ -244,16 +242,16 @@ export default function App() {
           <div className="modal-content glass">
             {showPreview ? (
               <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 20 }}>
-                <div style={{ background: 'rgba(0,0,0,0.2)', borderRadius: 20, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
-                  <img src={image} style={{ maxWidth: '100%', maxHeight: '60vh', objectFit: 'contain' }} />
+                <div style={{ background: 'rgba(0,0,0,0.4)', borderRadius: 20, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px', border: '1px solid var(--glass-border)' }}>
+                  <img src={image} style={{ maxWidth: '100%', maxHeight: '60vh', objectFit: 'contain' }} alt="Preview" />
                 </div>
-                <button className="btn-premium btn-main" style={{ width: '100%', height: 50 }} onClick={() => setShowPreview(false)}>{t('back')}</button>
+                <button className="control-btn btn-main" style={{ width: '100%', height: 55 }} onClick={() => setShowPreview(false)}>{t('back')}</button>
               </div>
             ) : view === 'gallery' ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <h2 style={{ margin: 0 }}>{t('gallery')}</h2>
-                  <label className="btn-premium btn-icon" style={{ cursor: 'pointer', padding: 12 }}>
+                  <label className="control-btn" style={{ cursor: 'pointer', height: '50px', width: '60px' }}>
                     <Icons.Upload /><input type="file" ref={fileInputRef} hidden accept="image/*" onChange={(e) => {
                       const f = e.target.files[0];
                       if (f) { setImage(URL.createObjectURL(f)); setView('board'); setIsPlaying(false); setTiles([...Array(TILE_COUNT).keys()]); }
@@ -265,25 +263,25 @@ export default function App() {
                     <Icons.Upload /><span style={{fontSize: '0.6rem', fontWeight: 800}}>{t('upload')}</span>
                   </div>
                   {DEFAULT_GALLERY.map((src, i) => (
-                    <div key={i} className="gallery-card" style={{ backgroundImage: `url(${src})` }} onClick={() => { setImage(src); setView('board'); setIsPlaying(false); setTiles([...Array(TILE_COUNT).keys()]); }} />
+                    <div key={i} className={`gallery-card ${image === src ? 'active' : ''}`} style={{ backgroundImage: `url(${src})`, objectFit: 'cover' }} onClick={() => { setImage(src); setView('board'); setIsPlaying(false); setTiles([...Array(TILE_COUNT).keys()]); }} />
                   ))}
                 </div>
-                <button className="btn-premium btn-main" style={{ width: '100%', height: 50 }} onClick={() => setView('board')}>{t('back')}</button>
+                <button className="control-btn btn-main" style={{ width: '100%', height: 55 }} onClick={() => setView('board')}>{t('back')}</button>
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
                 <h2 style={{ margin: 0 }}>{t('settings')}</h2>
-                <div className="stat-item" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   <label className="stat-label" style={{ textAlign: 'left' }}>{t('name')}</label>
-                  <input type="text" value={userName} onChange={(e) => setUserName(e.target.value)} className="btn-premium" style={{ width: '100%', background: 'rgba(0,0,0,0.1)', border: '1px solid var(--glass-border)', color: 'var(--text-main)', textAlign: 'left', paddingLeft: 16, height: 50 }} />
+                  <input type="text" value={userName} onChange={(e) => setUserName(e.target.value)} className="control-btn" style={{ width: '100%', background: 'rgba(0,0,0,0.2)', textAlign: 'left', paddingLeft: 16, height: 55, border: '1px solid var(--glass-border)' }} />
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                  <div className="stat-item"><label className="stat-label">{t('appearance')}</label><button className="btn-premium btn-icon" style={{ width: '100%', marginTop: 8, height: 50 }} onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>{theme === 'dark' ? '🌙' : '☀️'}</button></div>
-                  <div className="stat-item"><label className="stat-label">{t('sound')}</label><button className="btn-premium btn-icon" style={{ width: '100%', marginTop: 8, height: 50 }} onClick={() => setSoundEnabled(!soundEnabled)}>{soundEnabled ? '🔊' : '🔇'}</button></div>
+                  <div className="stat-item"><label className="stat-label">{t('appearance')}</label><button className="control-btn" style={{ width: '100%', marginTop: 8, height: 55 }} onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>{theme === 'dark' ? '🌙' : '☀️'}</button></div>
+                  <div className="stat-item"><label className="stat-label">{t('sound')}</label><button className="control-btn" style={{ width: '100%', marginTop: 8, height: 55 }} onClick={() => setSoundEnabled(!soundEnabled)}>{soundEnabled ? '🔊' : '🔇'}</button></div>
                 </div>
-                <div style={{ display: 'flex', gap: 10 }}><button className={`btn-premium btn-icon ${lang === 'fr' ? 'active' : ''}`} style={{ flex: 1, height: 40 }} onClick={() => setLang('fr')}>FR</button><button className={`btn-premium btn-icon ${lang === 'en' ? 'active' : ''}`} style={{ flex: 1, height: 40 }} onClick={() => setLang('en')}>EN</button></div>
-                <div className="bio-card"><div style={{ fontWeight: 800, color: 'var(--accent-primary)', marginBottom: 5 }}>Elodie ATANA</div><p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: 15 }}>{t('bio')}</p><a href="https://github.com/Codorah" target="_blank">{t('link')}</a></div>
-                <button className="btn-premium btn-main" style={{ width: '100%', height: 50 }} onClick={() => setView('board')}>{t('back')}</button>
+                <div style={{ display: 'flex', gap: 10 }}><button className={`control-btn ${lang === 'fr' ? 'active' : ''}`} style={{ flex: 1, height: 45 }} onClick={() => setLang('fr')}>FR</button><button className={`control-btn ${lang === 'en' ? 'active' : ''}`} style={{ flex: 1, height: 45 }} onClick={() => setLang('en')}>EN</button></div>
+                <div className="bio-card" style={{background: 'var(--glass-bg)', padding: 20, borderRadius: 20, border: '1px solid var(--glass-border)'}}><div style={{ fontWeight: 800, color: 'var(--accent-primary)', marginBottom: 5 }}>Elodie ATANA</div><p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: 15 }}>{t('bio')}</p><a href="https://github.com/Codorah" target="_blank" style={{color: 'var(--accent-primary)', textDecoration: 'none', fontWeight: 800}}>{t('link')}</a></div>
+                <button className="control-btn btn-main" style={{ width: '100%', height: 55 }} onClick={() => setView('board')}>{t('back')}</button>
               </div>
             )}
           </div>
