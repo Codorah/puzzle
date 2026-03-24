@@ -28,11 +28,12 @@ const DEFAULT_GALLERY = [
 ];
 
 /**
- * Audio Assets (Royalty-free/Public placeholders)
+ * Audio Assets (Mixkit Royalty-free)
  */
-const SFX = {
-  slide: new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'),
-  victory: new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3')
+const AUDIO_URLS = {
+  slide: 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3',
+  victory: 'https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3',
+  bg: 'https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3'
 };
 
 /**
@@ -146,6 +147,14 @@ export default function App() {
   // Records State
   const [records, setRecords] = useState({}); // { '3': { time: 10, moves: 20 }, ... }
 
+  // Audio Refs for precise control and persistence
+  const audioRefs = useRef({
+    slide: new Audio(AUDIO_URLS.slide),
+    victory: new Audio(AUDIO_URLS.victory),
+    bg: new Audio(AUDIO_URLS.bg)
+  });
+  const [audioUnlocked, setAudioUnlocked] = useState(false);
+
   // i18n helper
   const t = (key) => TRANSLATIONS[lang][key] || key;
 
@@ -164,14 +173,46 @@ export default function App() {
     });
   }, []);
 
+  // Audio Initialization & Background Loop
+  useEffect(() => {
+    const bg = audioRefs.current.bg;
+    bg.loop = true;
+    bg.volume = 0.2; // Ambient level
+    
+    if (soundEnabled && audioUnlocked) {
+      bg.play().catch(e => console.log("Audio play blocked:", e));
+    } else {
+      bg.pause();
+    }
+    
+    // Cleanup on unmount
+    return () => {
+      bg.pause();
+    };
+  }, [soundEnabled, audioUnlocked]);
+
+  const unlockAudio = useCallback(() => {
+    if (audioUnlocked) return;
+    
+    // Resume/Play all buffers to "unlock" them for the browser session
+    Object.values(audioRefs.current).forEach(audio => {
+      audio.play().then(() => {
+        audio.pause();
+        audio.currentTime = 0;
+      }).catch(() => {});
+    });
+    
+    setAudioUnlocked(true);
+  }, [audioUnlocked]);
+
   const playSfx = useCallback((type) => {
-    if (!soundEnabled) return;
-    const sound = SFX[type];
+    if (!soundEnabled || !audioUnlocked) return;
+    const sound = audioRefs.current[type];
     if (sound) {
       sound.currentTime = 0;
-      sound.play().catch(() => {}); // Browser policy might block initial play
+      sound.play().catch(() => {});
     }
-  }, [soundEnabled]);
+  }, [soundEnabled, audioUnlocked]);
 
   const triggerHaptic = useCallback(() => {
     if (window.navigator.vibrate) {
@@ -429,7 +470,7 @@ export default function App() {
   const formatTime = (s) => `${Math.floor(s / 60).toString().padStart(2, '0')}:${(s % 60).toString().padStart(2, '0')}`;
 
   return (
-    <div className="app-shell">
+    <div className="app-shell" onClick={unlockAudio}>
       {/* 0. Splash Screen */}
       {!isReady && (
         <div className="splash-screen">
