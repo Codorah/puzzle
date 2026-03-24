@@ -27,6 +27,68 @@ const DEFAULT_GALLERY = [
   '/gallery/renard.jpg', '/gallery/puzzle-1.png', '/gallery/puzzle-2.png', '/gallery/puzzle-3.png'
 ];
 
+/**
+ * i18n Translation Dictionary
+ */
+const TRANSLATIONS = {
+  fr: {
+    settings: 'Paramètres',
+    shareName: 'Pseudo de Partage',
+    namePlaceholder: 'Votre nom...',
+    darkMode: 'Thème Sombre',
+    sound: 'Effets Sonores',
+    langTitle: 'Langue / Language',
+    dev: 'Développeur',
+    shuffle: 'Mélanger',
+    hints: 'Indices',
+    preview: 'Aperçu',
+    gallery: 'Galerie',
+    upload: 'Importer',
+    difficulty: 'Difficulté',
+    easy: 'Facile (3x3)',
+    medium: 'Moyen (4x4)',
+    hard: 'Difficile (5x5)',
+    secretInput: 'Message secret...',
+    victory: 'VICTOIRE',
+    moves: 'Coups',
+    time: 'Temps',
+    secretMsg: 'Message Secret',
+    continueBtn: 'Continuer',
+    invalidImg: "Format d'image invalide.",
+    linkCopied: 'Lien copié dans le presse-papier !',
+    shareTitle: 'Défi Lumina Puzzle',
+    shareText: 'Je te défie de résoudre ce puzzle !',
+  },
+  en: {
+    settings: 'Settings',
+    shareName: 'Share Name',
+    namePlaceholder: 'Your name...',
+    darkMode: 'Dark Mode',
+    sound: 'Sound Effects',
+    langTitle: 'Language / Langue',
+    dev: 'Developer',
+    shuffle: 'Shuffle',
+    hints: 'Hints',
+    preview: 'Preview',
+    gallery: 'Gallery',
+    upload: 'Upload',
+    difficulty: 'Difficulty',
+    easy: 'Easy (3x3)',
+    medium: 'Medium (4x4)',
+    hard: 'Hard (5x5)',
+    secretInput: 'Secret message...',
+    victory: 'VICTORY',
+    moves: 'Moves',
+    time: 'Time',
+    secretMsg: 'Secret Message',
+    continueBtn: 'Continue',
+    invalidImg: 'Invalid image format.',
+    linkCopied: 'Link copied to clipboard!',
+    shareTitle: 'Lumina Puzzle Challenge',
+    shareText: 'I challenge you to solve this!',
+  }
+};
+
 export default function App() {
   // Gameplay State
   const [gridSize, setGridSize] = useState(3);
@@ -61,6 +123,15 @@ export default function App() {
   const [userName, setUserName] = useState('Player');
   const [theme, setTheme] = useState('dark');
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const [lang, setLang] = useState(() => localStorage.getItem('lumina_lang') || 'fr');
+
+  // i18n helper
+  const t = (key) => TRANSLATIONS[lang][key] || key;
+
+  // Persist language settings
+  useEffect(() => {
+    localStorage.setItem('lumina_lang', lang);
+  }, [lang]);
 
   // Load custom gallery on mount for persistent offline storage
   useEffect(() => {
@@ -266,7 +337,7 @@ export default function App() {
       };
       reader.readAsDataURL(file);
     } else {
-      alert("Invalid image format.");
+      alert(t('invalidImg'));
     }
   };
 
@@ -282,8 +353,8 @@ export default function App() {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'Lumina Puzzle Challenge',
-          text: 'I challenge you to solve this!',
+          title: t('shareTitle'),
+          text: t('shareText'),
           url: url
         });
       } catch (err) {
@@ -291,7 +362,7 @@ export default function App() {
       }
     } else {
       navigator.clipboard.writeText(url);
-      alert('Lien copié dans le presse-papier !');
+      alert(t('linkCopied'));
     }
   };
 
@@ -321,7 +392,7 @@ export default function App() {
               type="text"
               className="input-premium"
               style={{ width: '100%', maxWidth: '200px', padding: '8px 16px', fontSize: '0.9rem', background: 'transparent' }}
-              placeholder="Texte secret..."
+              placeholder={t('secretInput')}
               value={messageInput}
               onChange={(e) => setMessageInput(e.target.value)}
             />
@@ -329,7 +400,7 @@ export default function App() {
         )}
 
         <div className="header-actions">
-          <button className="btn-icon-labeled" style={{ minWidth: 'auto', padding: '8px' }} onClick={() => setShowSettings(true)} aria-label="Paramètres">
+          <button className="btn-icon-labeled" style={{ minWidth: 'auto', padding: '8px' }} onClick={() => setShowSettings(true)} aria-label={t('settings')}>
             <Icons.Settings />
           </button>
           <button className="btn-icon-labeled" style={{ minWidth: 'auto', padding: '8px' }} onClick={handleShare} aria-label="Partager">
@@ -379,19 +450,19 @@ export default function App() {
         {/* Victory Overlay Modal */}
         {isSolved && (
           <div className="victory-modal">
-            <h1 className="brand-logo" style={{ fontSize: '2.5rem', marginBottom: 10 }}>VICTOIRE</h1>
-            <p style={{ color: 'var(--text-muted)' }}>Coups: {moves} | Temps: {formatTime(time)}</p>
+            <h1 className="brand-logo" style={{ fontSize: '2.5rem', marginBottom: 10 }}>{t('victory')}</h1>
+            <p style={{ color: 'var(--text-muted)' }}>{t('moves')}: {moves} | {t('time')}: {formatTime(time)}</p>
 
             {/* The Mystery Reveal */}
             {(secretMessage || messageInput) && (
               <div className="mystery-reveal-box">
-                <span className="mystery-label">Message Secret</span>
+                <span className="mystery-label">{t('secretMsg')}</span>
                 <span className="mystery-text">{secretMessage || messageInput}</span>
               </div>
             )}
 
             <button className="btn-primary" style={{ marginTop: 30, width: '100%', maxWidth: 300 }} onClick={() => setIsSolved(false)}>
-              Continuer
+              {t('continueBtn')}
             </button>
           </div>
         )}
@@ -401,27 +472,27 @@ export default function App() {
       <footer className="app-toolbar">
         <button className="btn-icon-labeled" onClick={() => handleShuffle(null)}>
           <Icons.Shuffle />
-          <span>Mélanger</span>
+          <span>{t('shuffle')}</span>
         </button>
         <button className={`btn-icon-labeled ${showHints ? 'active' : ''}`} onClick={() => setShowHints(!showHints)}>
           <Icons.Hint />
-          <span>Indices</span>
+          <span>{t('hints')}</span>
         </button>
         {/* New Preview Toggle Button */}
         <button className={`btn-icon-labeled ${isPreviewMode ? 'active' : ''}`} onClick={() => setIsPreviewMode(!isPreviewMode)}>
           <Icons.Preview />
-          <span>Aperçu</span>
+          <span>{t('preview')}</span>
         </button>
         <button className="btn-icon-labeled" onClick={() => setView('gallery')}>
           <Icons.Gallery />
-          <span>Galerie</span>
+          <span>{t('gallery')}</span>
         </button>
       </footer>
 
       {/* Premium Full-Screen Settings Page */}
       <div className={`settings-page ${showSettings ? 'open' : ''}`}>
         <div className="settings-page-header">
-          <h2 style={{ fontSize: '1.4rem', fontWeight: 900 }}>Paramètres</h2>
+          <h2 style={{ fontSize: '1.4rem', fontWeight: 900 }}>{t('settings')}</h2>
           <button className="btn-icon-labeled" style={{ minWidth: 'auto', padding: 4 }} onClick={() => setShowSettings(false)}>
             <Icons.Close />
           </button>
@@ -429,13 +500,30 @@ export default function App() {
 
         <div className="settings-page-content">
           <div className="settings-container">
+
+            <div className="settings-section">
+              <span style={{ fontWeight: 600 }}>{t('langTitle')}</span>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button 
+                   className={`btn-secondary`}
+                   style={{ padding: '6px 12px', fontSize: '0.8rem', minWidth: 'auto', borderColor: lang === 'fr' ? 'var(--accent-blue)' : 'var(--glass-border)', color: lang === 'fr' ? 'var(--accent-blue)' : 'var(--text-primary)' }}
+                   onClick={() => setLang('fr')}
+                >FR</button>
+                <button 
+                   className={`btn-secondary`}
+                   style={{ padding: '6px 12px', fontSize: '0.8rem', minWidth: 'auto', borderColor: lang === 'en' ? 'var(--accent-blue)' : 'var(--glass-border)', color: lang === 'en' ? 'var(--accent-blue)' : 'var(--text-primary)' }}
+                   onClick={() => setLang('en')}
+                >EN</button>
+              </div>
+            </div>
+
             <div className="settings-section" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 8 }}>
-              <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Pseudo de Partage</label>
-              <input type="text" value={userName} onChange={(e) => setUserName(e.target.value)} className="input-premium" placeholder="Votre nom..." />
+              <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>{t('shareName')}</label>
+              <input type="text" value={userName} onChange={(e) => setUserName(e.target.value)} className="input-premium" placeholder={t('namePlaceholder')} />
             </div>
 
             <div className="settings-section">
-              <span style={{ fontWeight: 600 }}>Thème Sombre</span>
+              <span style={{ fontWeight: 600 }}>{t('darkMode')}</span>
               <label className="toggle-switch">
                 <input type="checkbox" checked={theme === 'dark'} onChange={() => setTheme(theme === 'dark' ? 'light' : 'dark')} />
                 <span className="toggle-slider"></span>
@@ -443,7 +531,7 @@ export default function App() {
             </div>
 
             <div className="settings-section">
-              <span style={{ fontWeight: 600 }}>Effets Sonores</span>
+              <span style={{ fontWeight: 600 }}>{t('sound')}</span>
               <label className="toggle-switch">
                 <input type="checkbox" checked={soundEnabled} onChange={() => setSoundEnabled(!soundEnabled)} />
                 <span className="toggle-slider"></span>
@@ -451,7 +539,7 @@ export default function App() {
             </div>
 
             <div style={{ background: 'var(--glass-bg)', padding: '20px', borderRadius: '16px', border: '1px solid var(--glass-border)', marginTop: 12 }}>
-              <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-muted)', marginBottom: 8 }}>Développeur</div>
+              <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-muted)', marginBottom: 8 }}>{t('dev')}</div>
               <div style={{ fontWeight: 900, fontSize: '1.2rem', color: 'var(--accent-blue)', marginBottom: 4 }}>Elodie ATANA</div>
               <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: 20 }}>Ingénieure IA & Lead Architect. Fondatrice de Codorah.</p>
 
@@ -471,7 +559,7 @@ export default function App() {
         <div className="sheet-content" onClick={(e) => e.stopPropagation()}>
 
           <div className="sheet-header">
-            <h2>{view === 'gallery' ? 'Galerie' : 'Difficulté'}</h2>
+            <h2>{view === 'gallery' ? t('gallery') : t('difficulty')}</h2>
             <button className="btn-icon-labeled" style={{ minWidth: 'auto', padding: 4 }} onClick={() => setView('board')}>
               <Icons.Close />
             </button>
@@ -483,7 +571,7 @@ export default function App() {
               <div className="gallery-grid">
                 <div className="upload-card" onClick={() => fileInputRef.current?.click()}>
                   <Icons.Upload />
-                  <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>Importer</span>
+                  <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>{t('upload')}</span>
                   <input type="file" ref={fileInputRef} hidden accept="image/*" onChange={handleImageUpload} />
                 </div>
                 
@@ -523,9 +611,9 @@ export default function App() {
             {/* Level Select View */}
             {view === 'level' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <button className="btn-secondary" onClick={() => handleShuffle(3)}>Facile (3x3)</button>
-                <button className="btn-secondary" onClick={() => handleShuffle(4)}>Moyen (4x4)</button>
-                <button className="btn-secondary" onClick={() => handleShuffle(5)}>Difficile (5x5)</button>
+                <button className="btn-secondary" onClick={() => handleShuffle(3)}>{t('easy')}</button>
+                <button className="btn-secondary" onClick={() => handleShuffle(4)}>{t('medium')}</button>
+                <button className="btn-secondary" onClick={() => handleShuffle(5)}>{t('hard')}</button>
               </div>
             )}
           </div>
