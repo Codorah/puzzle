@@ -32,13 +32,13 @@ const DEFAULT_GALLERY = [
  */
 const AUDIO_URLS = {
   // Tile slide sound ("poup poup" / click)
-  slide: 'https://cdn.freesound.org/previews/256/256113_3263901-lq.mp3',
+  slide: 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3',
   // Success sound
-  victory: 'https://cdn.freesound.org/previews/511/511484_4833214-lq.mp3',
+  victory: 'https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3',
   // Board shuffle sound
-  shuffle: 'https://cdn.freesound.org/previews/146/146726_2437358-lq.mp3',
-  // Background Ambient Loop
-  bg: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3'
+  shuffle: 'https://assets.mixkit.co/active_storage/sfx/1103/1103-preview.mp3',
+  // Background Ambient Loop (Gentle)
+  bg: 'https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3'
 };
 
 /**
@@ -215,7 +215,7 @@ export default function App() {
     if (initialParams.current.hasMsg) {
       handleShuffle(initialParams.current.level);
     }
-  }, [audioUnlocked, handleShuffle]);
+  }, [audioUnlocked]); // Remove dependency on handleShuffle to avoid loops
 
   const playSfx = useCallback((type) => {
     if (!soundEnabled || !audioUnlocked) return;
@@ -292,6 +292,8 @@ export default function App() {
 
     setTimeout(() => {
       setIsReady(true);
+      // If mystery, we don't need audio to BE unlocked to set the state, 
+      // but it will only play sound once the user clicks.
     }, 1500);
   }, [handleShuffle]);
 
@@ -484,22 +486,8 @@ export default function App() {
 
   return (
     <div className="app-shell" onClick={unlockAudio}>
-      {/* 0. Splash Screen with Audio Unlock */}
-      {!audioUnlocked && (
-        <div className="splash-screen" style={{ animation: 'none', background: 'rgba(10, 10, 11, 1)', opacity: 1, visibility: 'visible' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 40 }}>
-            <div className="brand-logo" style={{ fontSize: '4.5rem' }}>
-              <span className="brand-col-1">LU</span><span className="brand-col-2">MINA</span>
-            </div>
-            <button className="btn-primary" style={{ padding: '20px 60px', borderRadius: '40px', fontSize: '1.2rem', boxShadow: '0 0 30px rgba(59, 130, 246, 0.5)' }} onClick={unlockAudio}>
-              COMMENCER
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* 0.1 Initial Loading Splash (Legacy fade-out for visual polish) */}
-      {audioUnlocked && !isReady && (
+      {/* 0. Splash Screen (Automatic) */}
+      {!isReady && (
         <div className="splash-screen">
           <div className="brand-logo">
             <span className="brand-col-1">LU</span><span className="brand-col-2">MINA</span>
