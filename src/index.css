@@ -32,6 +32,18 @@
   --transition-smooth: 0.3s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
+/* Light Theme Output */
+body.light-theme {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --accent-blue: #2563eb;
+  --text-primary: #0f172a;
+  --text-muted: #64748b;
+  --glass-border: rgba(0, 0, 0, 0.1);
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --modal-overlay: rgba(248, 250, 252, 0.85);
+}
+
 /* Base Reset & Typography */
 * {
   margin: 0;

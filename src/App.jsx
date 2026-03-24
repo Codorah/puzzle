@@ -46,6 +46,11 @@ export default function App() {
   const [secretMessage, setSecretMessage] = useState(''); // Decoded from URL
   const [messageInput, setMessageInput] = useState(''); // Typed by user
   
+  // Settings State
+  const [userName, setUserName] = useState('Player');
+  const [theme, setTheme] = useState('dark');
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  
   // Initial URL parsing
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -224,7 +229,10 @@ export default function App() {
         )}
         
         <div className="header-actions">
-          <button className="btn-icon-labeled" onClick={handleShare} aria-label="Partager">
+          <button className="btn-icon-labeled" style={{minWidth: 'auto', padding: '8px'}} onClick={() => setView('settings')} aria-label="Paramètres">
+            <Icons.Settings />
+          </button>
+          <button className="btn-icon-labeled" style={{minWidth: 'auto', padding: '8px'}} onClick={handleShare} aria-label="Partager">
             <Icons.Share />
           </button>
         </div>
@@ -308,13 +316,37 @@ export default function App() {
         <div className="sheet-content" onClick={(e) => e.stopPropagation()}>
           
           <div className="sheet-header">
-            <h2>{view === 'gallery' ? 'Galerie' : view === 'level' ? 'Difficulté' : 'Aperçu'}</h2>
+            <h2>{view === 'gallery' ? 'Galerie' : view === 'level' ? 'Difficulté' : view === 'settings' ? 'Paramètres' : 'Aperçu'}</h2>
             <button className="btn-icon-labeled" style={{minWidth:'auto', padding:4}} onClick={() => setView('board')}>
               <Icons.Close />
             </button>
           </div>
 
           <div className="scroll-area">
+            {/* Settings View */}
+            {view === 'settings' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Pseudo de Partage</label>
+                  <input type="text" value={userName} onChange={(e) => setUserName(e.target.value)} className="input-premium" placeholder="Votre nom..." />
+                </div>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                  <button className="btn-secondary" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
+                    Thème: {theme === 'dark' ? 'Sombre' : 'Clair'}
+                  </button>
+                  <button className="btn-secondary" onClick={() => setSoundEnabled(!soundEnabled)}>
+                    Son: {soundEnabled ? 'Activé' : 'Coupé'}
+                  </button>
+                </div>
+
+                <div style={{background: 'var(--glass-bg)', padding: 16, borderRadius: 16, border: '1px solid var(--glass-border)'}}>
+                  <div style={{ fontWeight: 800, color: 'var(--accent-blue)', marginBottom: 4 }}>Elodie ATANA</div>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Ingénieure IA & Prompt Engineer. Fondatrice de Codorah.</p>
+                </div>
+              </div>
+            )}
+
             {/* Gallery View */}
             {view === 'gallery' && (
               <div className="gallery-grid">
