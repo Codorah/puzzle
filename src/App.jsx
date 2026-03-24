@@ -90,13 +90,14 @@ export default function App() {
     document.documentElement.style.setProperty('--grid-size', gridSize);
   }, [gridSize, TILE_COUNT]);
 
+  // URL Check (Updated for UTF-8)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const msg = params.get('msg');
     const imgIdx = params.get('img');
     const name = params.get('u');
     const level = parseInt(params.get('lvl'));
-    if (msg) try { setSecretMessage(atob(msg)); } catch (e) { }
+    if (msg) try { setSecretMessage(decodeURIComponent(escape(window.atob(msg)))); } catch (e) { }
     if (imgIdx && DEFAULT_GALLERY[imgIdx]) setImage(DEFAULT_GALLERY[imgIdx]);
     if (name) setUserName(name);
     if (level && [3, 4, 5].includes(level)) setGridSize(level);
@@ -161,7 +162,7 @@ export default function App() {
 
   const handleShare = () => {
     const imgIdx = DEFAULT_GALLERY.indexOf(image);
-    const msg = btoa(messageInput || secretMessage);
+    const msg = window.btoa(unescape(encodeURIComponent(messageInput || secretMessage)));
     const url = `${window.location.origin}${window.location.pathname}?img=${imgIdx >= 0 ? imgIdx : 'custom'}&msg=${msg}&u=${encodeURIComponent(userName)}&lvl=${gridSize}`;
     if (navigator.share) navigator.share({ title: `Challenge by ${userName}`, url });
     else { navigator.clipboard.writeText(url); alert(t('copied')); }
