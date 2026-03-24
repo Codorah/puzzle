@@ -544,3 +544,35 @@ body {
   border-color: var(--accent-blue);
   color: #fff;
 }
+
+/* Custom Gallery Item Delete Button */
+.custom-item {
+  position: relative;
+}
+.del-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 50%;
+  padding: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: background 0.2s, transform 0.2s;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+.del-btn:hover {
+  background: rgba(220, 38, 38, 0.9);
+  transform: scale(1.1);
+}
+.del-btn svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 3px;
+}

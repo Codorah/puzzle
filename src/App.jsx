@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import localforage from 'localforage';
 import './index.css';
 
 /**
@@ -49,6 +50,7 @@ export default function App() {
   const [view, setView] = useState('board'); // 'board' | 'gallery' | 'level'
   const [loadedImages, setLoadedImages] = useState({});
   const [croppedImage, setCroppedImage] = useState(null); // The perfectly squared image
+  const [customGallery, setCustomGallery] = useState([]); // User's personal uploaded photos
   const fileInputRef = useRef(null);
 
   // Mystery Message State
@@ -59,6 +61,13 @@ export default function App() {
   const [userName, setUserName] = useState('Player');
   const [theme, setTheme] = useState('dark');
   const [soundEnabled, setSoundEnabled] = useState(true);
+
+  // Load custom gallery on mount for persistent offline storage
+  useEffect(() => {
+    localforage.getItem('lumina_custom_gallery').then((data) => {
+      if (data && Array.isArray(data)) setCustomGallery(data);
+    });
+  }, []);
 
   // Shuffle Logic MUST be defined before it's used in initial effect
   const handleShuffle = useCallback((targetLevel) => {
@@ -104,8 +113,13 @@ export default function App() {
     const level = parseInt(params.get('lvl'));
 
     if (msg) try { setSecretMessage(decodeURIComponent(escape(window.atob(msg)))); } catch (e) { }
-    if (imgIdx && DEFAULT_GALLERY[imgIdx]) setImage(DEFAULT_GALLERY[imgIdx]);
-    else if (imgIdx === 'custom') setImage(DEFAULT_GALLERY[0]);
+    
+    // Automatically set image based on URL index
+    if (imgIdx && DEFAULT_GALLERY[imgIdx]) {
+      setImage(DEFAULT_GALLERY[imgIdx]);
+    } else if (imgIdx === 'custom') {
+      setImage(DEFAULT_GALLERY[0]); // Fallback safely for highly customized external links
+    }
 
     const initialLevel = (level && [3, 4, 5].includes(level)) ? level : 3;
     if (initialLevel !== 3) setGridSize(initialLevel);
@@ -203,14 +217,54 @@ export default function App() {
     }
   };
 
-  // Image Upload Logic
+  const deleteCustomImage = (index) => {
+    const newDocs = customGallery.filter((_, i) => i !== index);
+    setCustomGallery(newDocs);
+    localforage.setItem('lumina_custom_gallery', newDocs);
+    // Fallback to default if the deleted image is essentially what we are playing
+    if (image === customGallery[index]) {
+      setImage(DEFAULT_GALLERY[0]);
+    }
+  };
+
+  // Image Upload & Local Persistence Logic (via localforage)
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file && file.type.startsWith('image/')) {
-      setImage(URL.createObjectURL(file));
-      setView('board');
-      setIsPlaying(false);
-      setTiles([...Array(TILE_COUNT).keys()]);
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          // 1. Compress Image to avoid killing mobile browser IndexedDB Limits
+          const MAX_DIM = 1080;
+          let w = img.width;
+          let h = img.height;
+          if (w > MAX_DIM || h > MAX_DIM) {
+            const ratio = Math.min(MAX_DIM / w, MAX_DIM / h);
+            w *= ratio;
+            h *= ratio;
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+
+          // 2. Save inside LocalForage automatically
+          const newGallery = [compressedDataUrl, ...customGallery];
+          setCustomGallery(newGallery);
+          localforage.setItem('lumina_custom_gallery', newGallery);
+
+          // 3. Immediately launch the puzzle with this image
+          setImage(compressedDataUrl);
+          setView('board');
+          setIsPlaying(false);
+          setTiles([...Array(TILE_COUNT).keys()]);
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
     } else {
       alert("Invalid image format.");
     }
@@ -430,6 +484,22 @@ export default function App() {
                   <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>Importer</span>
                   <input type="file" ref={fileInputRef} hidden accept="image/*" onChange={handleImageUpload} />
                 </div>
+                
+                {/* 1. Custom Persisted User Gallery */}
+                {customGallery.map((src, i) => (
+                  <div
+                    key={`custom-${i}`}
+                    className={`gallery-item custom-item ${image === src ? 'active' : ''}`}
+                    onClick={() => { setImage(src); setView('board'); setIsPlaying(false); setTiles([...Array(TILE_COUNT).keys()]); }}
+                  >
+                    <img src={src} alt={`Upload ${i}`} loading="lazy" style={{ opacity: 1 }} />
+                    <button className="del-btn" onClick={(e) => { e.stopPropagation(); deleteCustomImage(i); }}>
+                      <Icons.Close />
+                    </button>
+                  </div>
+                ))}
+                
+                {/* 2. Default Preloaded Gallery */}
                 {DEFAULT_GALLERY.map((src, i) => (
                   <div
                     key={i}
