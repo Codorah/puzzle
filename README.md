@@ -1,85 +1,113 @@
-# 🧩 Lumina Elite - Documentation Complète
 
-## 📖 Présentation du Projet
-**Lumina Elite** est une application web de puzzle à glissement (Sliding Puzzle) de niveau App Store (Progressive Web App - PWA). Elle a été conçue pour offrir une expérience mobile luxueuse, fluide et immersive. Le concept est de reconstituer une image divisée en tuiles, avec un accent particulier mis sur la perfection du rendu visuel et la complexité des mécaniques sous-jacentes.
+<div align="center">
+  
+# 🧩 Lumina Elite
+Production-Ready Sliding Puzzle PWA & Gamified Messaging Protocol
 
-**Développeur** : Elodie ATANA (Ingénieure IA & Lead Architect, Fondatrice de Codorah)
+[![React](https://img.shields.io/badge/React-19.0-blue.svg?style=flat&logo=react)](https://reactjs.org/)
+[![Vite](https://img.shields.io/badge/Vite-8.0-purple.svg?style=flat&logo=vite)](https://vitejs.dev/)
+[![PWA](https://img.shields.io/badge/PWA-100%25_Offline-success.svg?style=flat&logo=pwa)](https://web.dev/progressive-web-apps/)
+[![Security](https://img.shields.io/badge/Security-Zero--Tracking-shield.svg?style=flat)](#-security--privacy-zero-tracking)
 
----
+### 🚀 [Play Lumina Elite Live](https://p-lumina.vercel.app/) 🚀
 
-## ⚙️ Stack Technique & Langages
+</div>
 
-L'application est construite sur une architecture moderne, légère et ultra-rapide.
 
-* **Cœur / Logique** : JavaScript (ES6+), HTML5
-* **Stylisation** : CSS3 Natif (Variables Root, Flexbox/Grid, Géométrie Dynamique `dvh`)
-* **Framework Front-end** : React (v19)
-* **Outil de Build & Serveur** : Vite (v8)
-* **Stockage Local** : `localforage` (Base de données locale asynchrone basée sur IndexedDB)
-* **Gestion Hors-Ligne (PWA)** : `vite-plugin-pwa` propulsé par Workbox
-* **Moteur d'Image** : HTML5 Canvas API (Context 2D WebGL)
 
----
+Lumina Elite is an App Store-grade Progressive Web App (PWA) that redefines the classic sliding puzzle. Engineered to deliver a luxurious, fluid, and immersive mobile experience, it transcends a simple game to become an asymmetric messaging tool. The architecture prioritizes visual perfection, native-like interactions, and complex client-side mechanics.
 
-## ✨ Fonctionnalités Principales (Features)
+Lead Architect & Developer: Elodie ATANA (AI Engineer & Founder of Codorah)
+⚙️ Tech Stack & Architecture
 
-### 1. 📱 App Shell Architecture (Interface Native)
-L'interface est structurée comme une véritable application native. **Il n'y a aucun défilement de page accidentel.** Le jeu s'adapte dynamiquement grâce aux fonctions mathématiques CSS (`min()`, `aspect-ratio`) et aux hauteurs dynamiques (`100dvh`). Peu importe le format du téléphone de l'utilisateur (très petit, large, portrait ou paysage), le puzzle reste un carré strict parfaitement centré sans jamais couper les boutons ou l'en-tête.
+Built on a modern, lightweight, and ultra-fast foundation:
 
-### 2. 🖼️ Moteur d'Upscaling & Recadrage Canvas
-Lorsqu'un utilisateur sélectionne une de ses propres photos, l'application ne se contente pas de l'afficher. L'image est interceptée en arrière-plan par un script `Canvas` qui :
-* **Recadre l'image en un carré parfait (1:1)**, empêchant totalement toute déformation ou étirement des tuiles.
-* **Met à l'échelle (Upscale) en Haute Définition (1080p min)** via l'accélération matérielle (`imageSmoothingQuality = 'high'`), assurant que même une petite image reste ultra-nette une fois découpée sur la grille du puzzle.
+    Core Logic: JavaScript (ES6+), HTML5
 
-### 3. 🌐 Progressive Web App (100% Hors-Ligne)
-Grâce aux Service Workers configurés via `vite-plugin-pwa`, un joueur n'a besoin du réseau qu'à sa première visite. L'application met en cache l'intégralité du code source (HTML, CSS, JS) ainsi que toutes les images par défaut. **Résultat : Le jeu de puzzle peut être lancé en mode avion, dans le métro ou sans 4G avec des performances instantanées.**
+    Styling: Native CSS3 (Root Variables, Flexbox/Grid, Dynamic Geometry dvh)
 
-### 4. 🗄️ Galerie Personnelle Persistante (IndexedDB)
-L'application propose une galerie d'images préchargées, mais permet également l'importation de photos. Grâce à **`localforage`**, ces photos volumineuses sont redimensionnées silencieusement (compression max 1080p) puis enregistrées dans la base de données `IndexedDB` du navigateur de l'utilisateur.
-* Les photos importées survivent à la fermeture de l'onglet ou au redémarrage du téléphone.
-* C'est un stockage 100% privé, sans aucun serveur cloud, qui permet au joueur de constituer sa propre collection hors-ligne.
-* Possibilité de supprimer les photos importées directement depuis la galerie.
+    Frontend Framework: React (v19)
 
-### 5. ✉️ Mécanique de Message Mystère (Cryptage URL)
-Le joueur peut taper un "Message Secret" et générer un lien de défi à envoyer à un ami. 
-* Le message est encodé en **Base64** textuel de manière sécurisée (UTF-8) via l'URL (ex: `?msg=SGVsbG8=`).
-* Le destinataire du lien verra le puzzle, mais ne pourra lire le texte secret qu'**après avoir résolu** le puzzle avec succès (apparition de l'écran de Victoire).
-* Aucune base de données backend n'est nécessaire pour cet échange, tout est géré de pair-à-pair côté client.
+    Build Tool & Server: Vite (v8)
 
-### 6. 🔀 Auto-Mélange Dynamique (Auto-Shuffle)
-L'expérience utilisateur du partage est poussée au maximum : si l'application détecte qu'un joueur a ouvert un lien de défi, dès que l'animation du logo de démarrage se termine, **l'application sélectionne l'image reçue et mélange automatiquement les tuiles sous les yeux du joueur** au niveau de difficulté (ex: 5x5) dicté par le lien (`?lvl=5`).
+    Local Storage: localforage (Asynchronous local database utilizing IndexedDB)
 
-### 7. 🎨 UI/UX Premium & Glassmorphism
-* L'application arbore un thème "Dark Mode Luxe" avec des couleurs obsidiennes, des bleus électriques fluos et de l'or.
-* **Effets de Verre (Glassmorphism)** : Les modals, le header et les menus de réglages emploient des filtres de flou (`backdrop-filter`) et des transparences sophistiquées.
-* **Aperçu Fluide (Seamless Preview)** : En pleine partie de puzzle, le bouton d'Aperçu superpose l'image complète avec un fondu enchaîné élégant (crossfade) sans avoir besoin de fermer l'écran de jeu.
-* **Page Paramètres Native** : Conçue comme une vraie page d'application mobile (`100% dvh`) qui glisse du bas de l'écran, avec des interrupteurs iOS pour le mode de thème et du son.
+    Offline Management (PWA): vite-plugin-pwa powered by Workbox
 
----
+    Image Processing Engine: HTML5 Canvas API (2D WebGL Context)
 
-## 📂 Architecture des Fichiers Clés
+ Core Engineering Features
+1. App Shell Architecture (Native Interface)
 
-* `src/App.jsx` : Contient l'intégralité de la logique de jeu, des cycles de vie React (`useEffect`, `useState`), du moteur de Canvas HD, du partage d'URL et des requêtes LocalForage. L'ensemble est hautement structuré et commenté.
-* `src/index.css` : Le système de design "Single Source of Truth", gérant la géométrie responsive extrême (`min()`, `100dvh`), les animations (`@keyframes`), et le système de thème piloté par variables CSS (`--bg-primary`, etc).
-* `vite.config.js` : Configuration du bundler avec intégration du plugin PWA (`vite-plugin-pwa`) et définitions des règles `Workbox` (cache global des assets statiques et images `/gallery/...`).
+The UI is strictly structured as a native application. Zero accidental scrolling. The game layout adapts dynamically using advanced CSS mathematical functions (min(), aspect-ratio) and dynamic viewport heights (100dvh). Whether on a compact smartphone, a wide tablet, in portrait, or landscape mode, the puzzle remains a perfect, strictly centered square without ever cropping buttons or headers.
+2 Canvas-Powered HD Upscaling & Cropping Engine
 
----
+When users upload personal photos, the application bypasses basic rendering. The image is intercepted in the background by a dedicated Canvas script that:
 
-## 🛠️ Instructions de Lancement
+    Crops to a perfect square (1:1 ratio), completely preventing tile distortion or stretching.
 
-```bash
-# 1. Cloner ou télécharger le dépôt
+    Upscales to High Definition (1080p min) using hardware acceleration (imageSmoothingQuality = 'high'), ensuring optimal sharpness even for smaller source images once sliced onto the grid.
+
+3. Offline-First PWA (100% Network Independent)
+
+Leveraging Service Workers configured via vite-plugin-pwa, users only need network access for the initial visit. The application caches the entire source code (HTML, CSS, JS) and default gallery assets. Result: Instantaneous performance in airplane mode, underground, or in zero-connectivity environments.
+4. Persistent Private Gallery (IndexedDB)
+
+Beyond the curated pre-loaded gallery, users can import personal high-resolution photos. Using localforage, these heavy files are silently compressed (1080p cap) and stored directly in the browser's IndexedDB.
+
+    Uploaded assets persist across sessions and device reboots.
+
+    100% private, client-side storage with zero cloud server involvement.
+
+    Full CRUD capabilities directly within the gallery UI.
+
+5.  Asymmetric Messaging & URL Cryptography
+
+Users can embed a "Secret Message" to generate a challenge link.
+
+    The payload is securely encoded into textual Base64 (UTF-8 compliant) directly within the URL parameters (e.g., ?msg=SGVsbG8=).
+
+    The recipient sees the puzzle interface but can only decrypt and read the hidden text upon successful resolution of the grid (Victory State trigger).
+
+    No backend database is required; the data transfer is strictly peer-to-peer via URL state.
+
+6. Dynamic Auto-Shuffle Execution
+
+Seamless UX for shared challenges: if the application detects a challenge link upon launch, immediately following the startup animation, it automatically selects the payload image and shuffles the tiles at the exact difficulty level dictated by the URL parameters (e.g., ?lvl=5).
+7.  Premium UI/UX & Glassmorphism
+
+    Dark Mode Luxe: Obsidian backgrounds, electric blue accents, and gold highlights.
+
+    Glassmorphism: Modals, headers, and settings menus utilize advanced blur filters (backdrop-filter) and sophisticated opacities.
+
+    Seamless Preview: During gameplay, the Preview function superimposes the solved image using an elegant crossfade transition without disrupting the game state.
+
+    Native-Style Settings: A strictly defined 100dvh settings view that slides from the bottom, featuring iOS-style toggles for theme and audio management.
+
+Repository Architecture
+
+    src/App.jsx: The core engine. Contains the React lifecycles (useEffect, useState), the HD Canvas engine logic, URL state parsing, and localforage queries. Highly structured and documented for maintainability.
+
+    src/index.css: The "Single Source of Truth" design system. Manages extreme responsive geometry (min(), 100dvh), keyframe animations, and the CSS variable-driven theming engine.
+
+    vite.config.js: Bundler configuration housing the PWA plugin setup and Workbox rules (global caching strategies for static assets and /gallery/ endpoints).
+
+🛠️ Getting Started / Installation
+Bash
+
+# 1. Clone the repository
 git clone https://github.com/Codorah/puzzle.git
 
-# 2. Installer les dépendances (React, Vite, LocalForage)
+# 2. Navigate to the directory and install dependencies
 npm install
 
-# 3. Lancer le serveur de développement local
+# 3. Start the local development server
 npm run dev
 
-# 4. Compiler pour la production / déploiement (génère le dossier /dist)
+# 4. Build for production / deployment (generates the /dist folder)
 npm run build
-```
 
-## 🔐 Sécurité & Transparence
-Lumina Elite est une application **Zéro-Tracking**. Aucune donnée personnelle, aucune image importée, ni aucun message secret n'est envoyé vers internet ou hébergé. Toute l'intelligence (Redimensionnement Canvas, Sauvegarde IndexedDB, Décryptage URL) s'exécute exclusivement **côté-client** directement dans la Sandbox du navigateur de l'utilisateur final. L'application est intrinsèquement protégée ("Secure by Design") grâce à ce fonctionnement 100% local.
+
+ Security & Privacy (Zero-Tracking)
+
+Lumina Elite is a Zero-Tracking application. No personal data, uploaded images, or secret messages are ever transmitted to the internet or hosted on external servers. All processing intelligence—including Canvas resizing, IndexedDB storage, and URL decryption—executes exclusively client-side within the end-user's browser sandbox. The architecture is inherently "Secure by Design" through its 100% local execution model.
