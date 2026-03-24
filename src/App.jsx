@@ -28,12 +28,17 @@ const DEFAULT_GALLERY = [
 ];
 
 /**
- * Audio Assets (Mixkit Royalty-free)
+ * Audio Assets (Using stable, widely-accessible URLs)
  */
 const AUDIO_URLS = {
-  slide: 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3',
-  victory: 'https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3',
-  bg: 'https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3'
+  // Tile slide sound ("poup poup" / click)
+  slide: 'https://cdn.freesound.org/previews/256/256113_3263901-lq.mp3',
+  // Success sound
+  victory: 'https://cdn.freesound.org/previews/511/511484_4833214-lq.mp3',
+  // Board shuffle sound
+  shuffle: 'https://cdn.freesound.org/previews/146/146726_2437358-lq.mp3',
+  // Background Ambient Loop
+  bg: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3'
 };
 
 /**
@@ -151,6 +156,7 @@ export default function App() {
   const audioRefs = useRef({
     slide: new Audio(AUDIO_URLS.slide),
     victory: new Audio(AUDIO_URLS.victory),
+    shuffle: new Audio(AUDIO_URLS.shuffle),
     bg: new Audio(AUDIO_URLS.bg)
   });
   const [audioUnlocked, setAudioUnlocked] = useState(false);
@@ -229,6 +235,7 @@ export default function App() {
 
     setView('board');
     setGridSize(targetLevel);
+    playSfx('shuffle');
 
     setTimeout(() => {
       let newTiles = [...Array(targetLevel * targetLevel).keys()];
@@ -277,8 +284,6 @@ export default function App() {
 
     setTimeout(() => {
       setIsReady(true);
-      // Auto-shuffle if a message was shared so the user can play immediately
-      if (msg) handleShuffle(initialLevel); 
     }, 1500);
   }, [handleShuffle]);
 
@@ -471,8 +476,22 @@ export default function App() {
 
   return (
     <div className="app-shell" onClick={unlockAudio}>
-      {/* 0. Splash Screen */}
-      {!isReady && (
+      {/* 0. Splash Screen with Audio Unlock */}
+      {!audioUnlocked && (
+        <div className="splash-screen" style={{ animation: 'none', background: 'rgba(10, 10, 11, 1)', opacity: 1, visibility: 'visible' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 40 }}>
+            <div className="brand-logo" style={{ fontSize: '4.5rem' }}>
+              <span className="brand-col-1">LU</span><span className="brand-col-2">MINA</span>
+            </div>
+            <button className="btn-primary" style={{ padding: '20px 60px', borderRadius: '40px', fontSize: '1.2rem', boxShadow: '0 0 30px rgba(59, 130, 246, 0.5)' }} onClick={unlockAudio}>
+              COMMENCER
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 0.1 Initial Loading Splash (Legacy fade-out for visual polish) */}
+      {audioUnlocked && !isReady && (
         <div className="splash-screen">
           <div className="brand-logo">
             <span className="brand-col-1">LU</span><span className="brand-col-2">MINA</span>
