@@ -416,17 +416,17 @@ export default function App() {
         </button>
       </footer>
 
-      {/* Premium Glass Settings Modal */}
-      <div className={`glass-modal-overlay ${showSettings ? 'open' : ''}`} onClick={() => setShowSettings(false)}>
-        <div className="glass-modal" onClick={e => e.stopPropagation()}>
-          <div className="sheet-header" style={{ marginBottom: 20 }}>
-            <h2>Paramètres</h2>
-            <button className="btn-icon-labeled" style={{ minWidth: 'auto', padding: 4 }} onClick={() => setShowSettings(false)}>
-              <Icons.Close />
-            </button>
-          </div>
+      {/* Premium Full-Screen Settings Page */}
+      <div className={`settings-page ${showSettings ? 'open' : ''}`}>
+        <div className="settings-page-header">
+          <h2 style={{ fontSize: '1.4rem', fontWeight: 900 }}>Paramètres</h2>
+          <button className="btn-icon-labeled" style={{ minWidth: 'auto', padding: 4 }} onClick={() => setShowSettings(false)}>
+            <Icons.Close />
+          </button>
+        </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div className="settings-page-content">
+          <div className="settings-container">
             <div className="settings-section" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 8 }}>
               <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Pseudo de Partage</label>
               <input type="text" value={userName} onChange={(e) => setUserName(e.target.value)} className="input-premium" placeholder="Votre nom..." />

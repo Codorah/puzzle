@@ -468,37 +468,49 @@ body {
 .toggle-switch input:checked + .toggle-slider { background-color: var(--accent-blue); }
 .toggle-switch input:checked + .toggle-slider:before { transform: translateX(22px); }
 
-/* Centered Glass Modal (Used for Settings over the entire app) */
-.glass-modal-overlay {
+/* Full-Screen Settings Page */
+.settings-page {
   position: fixed;
   inset: 0;
-  z-index: 2000;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  z-index: 3000;
+  background: var(--bg-primary);
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
   opacity: 0;
   visibility: hidden;
-  transition: all var(--transition-smooth);
+  transform: translateY(100%);
+  transition: transform var(--transition-smooth), opacity var(--transition-smooth);
 }
-.glass-modal-overlay.open {
-  opacity: 1; visibility: visible;
+.settings-page.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
 }
-.glass-modal {
-  width: 90%;
-  max-width: 420px;
-  background: var(--bg-primary);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
+.settings-page-header {
+  height: var(--header-height);
+  padding: 0 var(--spacing-lg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  flex-shrink: 0;
+}
+.settings-page-content {
+  flex-grow: 1;
+  overflow-y: auto;
   padding: var(--spacing-lg);
-  box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255,255,255,0.05);
-  transform: translateY(30px) scale(0.95);
-  transition: all var(--transition-smooth);
+  padding-bottom: 100px;
 }
-.glass-modal-overlay.open .glass-modal {
-  transform: translateY(0) scale(1);
+.settings-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 .settings-section {
   display: flex; justify-content: space-between; align-items: center;

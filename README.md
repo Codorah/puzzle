@@ -1,48 +1,43 @@
-# 🧩 Lumina: Premium Puzzle
+# Lumina Elite: Premium Sliding Puzzle PWA
 
-A world-class, high-fidelity Progressive Web Application (PWA) sliding puzzle game. **Lumina** combines a minimalist, glassmorphic aesthetic with advanced front-end engineering to deliver a truly premium gaming experience.
+Lumina Elite is a world-class, premium sliding puzzle web application built with React, Vite, and absolute attention to detail and design. It features an array of incredible mobile-first mechanics, secure offline persistence, and seamless social sharing functionality.
 
-## ✨ Features
-- **Lumina Branding**: A sophisticated identity focused on light, precision, and elegance.
-- **Glassmorphic UI**: High-end visual effects using frosted glass backgrounds and subtle obsidian-to-slate gradients.
-- **Custom Photo Engine**: Securely upload and slice your own photos into high-resolution puzzles.
-- **Curated Gallery**: includes a professional collection of premium abstract and cosmic photography.
-- **Universal Accessibility**: 
-  - **Multi-language**: Seamless switching between French 🇫🇷, English 🇺🇸, and Spanish 🇪🇸.
-  - **Theming**: Premium Dark and Light modes for any lighting environment.
-- **PWA Excellence**: Installable on any device with offline play support via optimized Service Workers.
-- **Seamless Board**: Precisely calibrated tile alignment with zero gaps for an immersive visual experience.
+**Developer:** Elodie ATANA (Ingénieure IA & Lead Architect, Codorah)
 
-## 🔒 Security Posture
-Built with a "Security-First" mindset:
-- **XSS & DoS Protection**: Strict MIME-type validation (`JPG`, `PNG`, `WEBP`) and 5MB payload limits for image uploads.
-- **Hardened Headers**: `vercel.json` inclusion for `X-Frame-Options: DENY` and `nosniff` protection.
-- **Supply Chain Integrity**: Audited dependencies to ensure a clean software lifecycle.
+## 🚀 Key Features
 
-## 🚀 Quick Start
+* **App Shell Architecture**: True mobile-native feel. Zero scrolling, no overflow, perfectly locked iOS/Android experience. Responsive to any screen size.
+* **Full-Screen Settings Page**: A comprehensive, sliding settings menu featuring iOS-style toggle interactions, custom theme switching, and access to developer portfolio links.
+* **Canvas HD Upscaler & Square Cropper**: Never see a distorted or low-resolution image again. Any image uploaded or chosen is intercepted via a rigorous WebGL/Canvas algorithm, perfectly cropped to a 1:1 format, and artificially upscaled to *at least* 1080p high definition (HD) before rendering the puzzle.
+* **100% Offline PWA (Service Workers)**: Powered by `vite-plugin-pwa`. Once loaded, the game caches all assets, scripts, and the complete image gallery via an aggressive Workbox policy. You can play completely without an internet connection!
+* **Persistent Custom User Gallery**: Uploaded images are cleanly compressed without losing quality and saved directly to the device browser's `IndexedDB` using `localforage`. They stay in your private gallery permanently, available even offline.
+* **Mystery Message Sharing**: Encode a secret message into a `base64` shared link. The recipient will only see your custom message *after* successfully completing the puzzle!
+* **Instant Auto-Shuffle**: When a friend opens your shared link, the splash screen fades and the board instantly shuffles automatically at the exact difficulty level (e.g., 5x5) you sent them.
+* **Glassmorphic UI & Dark Mode**: A stunning Obsidian Dark/Bright Light theme paired with precise blur filters, beautiful bottom sheets for Gallery/Difficulty, and sleek buttons.
+* **Seamless Crossfade Preview**: Press the "Aperçu" button to seamlessly crossfade from the playable puzzle grid to the fully solved image directly over the board, without breaking the layout.
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/Codorah/puzzle.git
-   cd puzzle
-   ```
+## 🛠️ Technology Stack
 
-2. **Install dependencies**:
-   ```bash
-   npm install --legacy-peer-deps
-   ```
+* **Core**: React 19 & Vite 8
+* **Styling**: Vanilla CSS entirely driven by Root CSS Variables for atomic consistency.
+* **Storage**: `localforage` (IndexedDB Wrapper for robust unlimited offline image storage)
+* **PWA**: `vite-plugin-pwa` (Offline Service Workers, Webmanifest generation)
 
-3. **Run development server**:
-   ```bash
-   npm run dev
-   ```
+## 💻 Installation & Usage
 
-## 🌐 Deployment
-Optimized for **Vercel**:
 ```bash
+# Clone the repository
+# Navigate to the project directory
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Build for production
 npm run build
-vercel --prod
 ```
 
----
-*Developed by Elodie ATANA (Codorah) — Bridging AI, Design, and Engineering.*
+## 🔒 Security & Privacy Statement
+This is a zero-tracking application. This application evaluates no external APIs and operates entirely locally on your machine/device. All user-uploaded images and secret messages are processed locally in the browser's DOM securely. Mystery messages use UTF-8 base64 encoding and are decoded purely client-side without ever touching a server database.
