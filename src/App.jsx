@@ -28,12 +28,13 @@ const DEFAULT_GALLERY = [
 ];
 
 /**
- * Senior Audio Architecture: Stable Constants
+ * Senior Audio Architecture: Local PWA Assets
+ * Place these files in: /public/audio/
  */
-const BGM_URL = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3';
-const SLIDE_SFX_URL = 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3';
-const VICTORY_SFX_URL = 'https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3';
-const SHUFFLE_SFX_URL = 'https://assets.mixkit.co/active_storage/sfx/1103/1103-preview.mp3';
+const BGM_URL = '/audio/bgm.mp3';
+const SLIDE_SFX_URL = '/audio/slide.mp3';
+const VICTORY_SFX_URL = '/audio/victory.mp3';
+const SHUFFLE_SFX_URL = '/audio/shuffle.mp3';
 
 /**
  * i18n Translation Dictionary
@@ -145,10 +146,10 @@ export default function App() {
   // Records State
   const [records, setRecords] = useState({}); // { '3': { time: 10, moves: 20 }, ... }
 
-  // Audio management (Expert Web Audio Implementation)
+  // Audio management (Unified PWA Ref)
   const audioCtx = useRef(null);
-  const bgmRef = useRef(null);
-  const sfxRefs = useRef({
+  const audioRef = useRef({
+    bg: null,
     slide: null,
     victory: null,
     shuffle: null
@@ -177,21 +178,20 @@ export default function App() {
 
   // Audio Initialization & BGM Setup
   useEffect(() => {
-    // 1. Initialize Audio Objects on mount (Expert CORS fix)
+    // 1. Initialize Audio Objects on mount (Local PWA Strategy)
     try {
         const createAudio = (url, isLoop = false, vol = 1) => {
             const a = new Audio(url);
-            a.crossOrigin = "anonymous"; // Bypass ORB/CORS
             a.preload = "auto";
             a.loop = isLoop;
             a.volume = vol;
             return a;
         };
 
-        bgmRef.current = createAudio(BGM_URL, true, 0); // Start at 0 for fade-in or 0.4 as requested
-        sfxRefs.current.slide = createAudio(SLIDE_SFX_URL);
-        sfxRefs.current.victory = createAudio(VICTORY_SFX_URL);
-        sfxRefs.current.shuffle = createAudio(SHUFFLE_SFX_URL);
+        audioRef.current.bg = createAudio(BGM_URL, true, 0); 
+        audioRef.current.slide = createAudio(SLIDE_SFX_URL);
+        audioRef.current.victory = createAudio(VICTORY_SFX_URL);
+        audioRef.current.shuffle = createAudio(SHUFFLE_SFX_URL);
     } catch (e) {
         console.error("Audio init failed:", e);
     }
@@ -202,25 +202,16 @@ export default function App() {
     });
 
     return () => {
-      if (bgmRef.current) bgmRef.current.pause();
+      if (audioRef.current.bg) audioRef.current.bg.pause();
       if (audioCtx.current) {
           audioCtx.current.close().catch(() => {});
       }
     };
   }, []);
 
-  // BGM Sync Logic
+  // BGM Logic: Play/Pause/Fade/Mute (Unified Sync)
   useEffect(() => {
-    if (bgmRef.current) {
-        bgmRef.current.muted = isMuted;
-        if (isMuted) bgmRef.current.pause();
-        else if (audioUnlocked) bgmRef.current.play().catch(() => {});
-    }
-  }, [isMuted, audioUnlocked]);
-
-  // BGM Logic: Play/Pause/Fade/Mute (Senior Developer Sync)
-  useEffect(() => {
-    const bg = audioRefs.current.bg;
+    const bg = audioRef.current.bg;
     if (!bg) return;
 
     bg.muted = isMuted;
@@ -230,13 +221,13 @@ export default function App() {
             // Smooth Fade-in
             let vol = 0;
             const fadeIn = setInterval(() => {
-              if (!audioRefs.current.bg) { clearInterval(fadeIn); return; }
+              if (!audioRef.current.bg) { clearInterval(fadeIn); return; }
               vol += 0.05;
               if (vol >= 0.3) {
-                  audioRefs.current.bg.volume = 0.3;
+                  audioRef.current.bg.volume = 0.3;
                   clearInterval(fadeIn);
               } else {
-                  audioRefs.current.bg.volume = vol;
+                  audioRef.current.bg.volume = vol;
               }
             }, 100);
         }).catch(e => console.log("Audio play blocked:", e));
@@ -248,8 +239,8 @@ export default function App() {
   const toggleMute = () => {
     const newVal = !isMuted;
     setIsMuted(newVal);
-    if (bgmRef.current) {
-        bgmRef.current.muted = newVal;
+    if (audioRef.current.bg) {
+        audioRef.current.bg.muted = newVal;
     }
     localforage.setItem('lumina_muted', newVal);
   };
@@ -300,7 +291,7 @@ export default function App() {
   const unlockAudio = useCallback(() => {
     if (audioUnlocked) return;
     
-    // 1. Initialize/Resume Web Audio Context (Synthetic SFX)
+    // 1. Initialize/Resume Web Audio Context (Synthetic Generator)
     if (!audioCtx.current) {
         audioCtx.current = new (window.AudioContext || window.webkitAudioContext)();
     }
@@ -308,14 +299,8 @@ export default function App() {
         audioCtx.current.resume();
     }
     
-    // 2. Unlock & Play BGM (0.4 volume as requested)
-    if (bgmRef.current && !isMuted) {
-       bgmRef.current.volume = 0.4;
-       bgmRef.current.play().catch(e => console.error("BGM Start Failed:", e));
-    }
-    
-    // 3. Unlock SFX buffers
-    Object.values(sfxRefs.current).forEach(audio => {
+    // 2. Unlock & Play All Buffers (Unified Ref)
+    Object.values(audioRef.current).forEach(audio => {
       if (audio) {
         audio.play().then(() => {
             audio.pause();
@@ -334,8 +319,8 @@ export default function App() {
   const playSfx = useCallback((type) => {
     if (isMuted || !audioUnlocked || !audioCtx.current) return;
     
-    // Standard SFX (Native Audio)
-    const sound = sfxRefs.current[type];
+    // Standard SFX (Native Audio from Unified Ref)
+    const sound = audioRef.current[type];
     if (sound) {
       sound.currentTime = 0;
       sound.play().catch(() => {});
