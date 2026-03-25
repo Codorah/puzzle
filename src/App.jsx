@@ -31,14 +31,8 @@ const DEFAULT_GALLERY = [
  * Audio Assets (Using stable, widely-accessible URLs)
  */
 const AUDIO_URLS = {
-  // Tile slide sound ("poup poup" / click)
-  slide: 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3',
-  // Success sound
-  victory: 'https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3',
-  // Board shuffle sound
-  shuffle: 'https://assets.mixkit.co/active_storage/sfx/1103/1103-preview.mp3',
-  // Background Ambient Loop (Gentle)
-  bg: 'https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3'
+  // Background Ambient Loop - Using a stable Archive.org or SoundHelix source
+  bg: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'
 };
 
 /**
@@ -152,13 +146,11 @@ export default function App() {
   // Records State
   const [records, setRecords] = useState({}); // { '3': { time: 10, moves: 20 }, ... }
 
-  // Audio Refs for precise control and persistence
+  // Audio management
   const audioRefs = useRef({
-    slide: new Audio(AUDIO_URLS.slide),
-    victory: new Audio(AUDIO_URLS.victory),
-    shuffle: new Audio(AUDIO_URLS.shuffle),
     bg: new Audio(AUDIO_URLS.bg)
   });
+  const audioCtx = useRef(null);
   const [audioUnlocked, setAudioUnlocked] = useState(false);
   const initialParams = useRef({ level: 3, hasMsg: false });
 
