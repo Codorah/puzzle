@@ -145,14 +145,14 @@ export default function App() {
   // Records State
   const [records, setRecords] = useState({}); // { '3': { time: 10, moves: 20 }, ... }
 
-  // Audio management (Senior Game Dev Implementation - Lazy Init for safety)
-  const audioRefs = useRef({
-    bg: null,
+  // Audio management (Expert Web Audio Implementation)
+  const audioCtx = useRef(null);
+  const bgmRef = useRef(null);
+  const sfxRefs = useRef({
     slide: null,
     victory: null,
     shuffle: null
   });
-  const audioCtx = useRef(null);
   const [audioUnlocked, setAudioUnlocked] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const initialParams = useRef({ level: 3, hasMsg: false });
@@ -175,24 +175,23 @@ export default function App() {
     });
   }, []);
 
-  // Audio Initialization & BGM Control
+  // Audio Initialization & BGM Setup
   useEffect(() => {
-    // 1. Initialize Audio Objects on mount (Defensive + CORS fix)
+    // 1. Initialize Audio Objects on mount (Expert CORS fix)
     try {
-        const createAudio = (url) => {
+        const createAudio = (url, isLoop = false, vol = 1) => {
             const a = new Audio(url);
-            a.crossOrigin = "anonymous";
+            a.crossOrigin = "anonymous"; // Bypass ORB/CORS
             a.preload = "auto";
+            a.loop = isLoop;
+            a.volume = vol;
             return a;
         };
 
-        audioRefs.current.bg = createAudio(BGM_URL);
-        audioRefs.current.slide = createAudio(SLIDE_SFX_URL);
-        audioRefs.current.victory = createAudio(VICTORY_SFX_URL);
-        audioRefs.current.shuffle = createAudio(SHUFFLE_SFX_URL);
-        
-        audioRefs.current.bg.loop = true;
-        audioRefs.current.bg.volume = 0;
+        bgmRef.current = createAudio(BGM_URL, true, 0); // Start at 0 for fade-in or 0.4 as requested
+        sfxRefs.current.slide = createAudio(SLIDE_SFX_URL);
+        sfxRefs.current.victory = createAudio(VICTORY_SFX_URL);
+        sfxRefs.current.shuffle = createAudio(SHUFFLE_SFX_URL);
     } catch (e) {
         console.error("Audio init failed:", e);
     }
@@ -203,12 +202,21 @@ export default function App() {
     });
 
     return () => {
-      if (audioRefs.current.bg) audioRefs.current.bg.pause();
+      if (bgmRef.current) bgmRef.current.pause();
       if (audioCtx.current) {
           audioCtx.current.close().catch(() => {});
       }
     };
   }, []);
+
+  // BGM Sync Logic
+  useEffect(() => {
+    if (bgmRef.current) {
+        bgmRef.current.muted = isMuted;
+        if (isMuted) bgmRef.current.pause();
+        else if (audioUnlocked) bgmRef.current.play().catch(() => {});
+    }
+  }, [isMuted, audioUnlocked]);
 
   // BGM Logic: Play/Pause/Fade/Mute (Senior Developer Sync)
   useEffect(() => {
@@ -240,8 +248,8 @@ export default function App() {
   const toggleMute = () => {
     const newVal = !isMuted;
     setIsMuted(newVal);
-    if (audioRefs.current.bg) {
-        audioRefs.current.bg.muted = newVal;
+    if (bgmRef.current) {
+        bgmRef.current.muted = newVal;
     }
     localforage.setItem('lumina_muted', newVal);
   };
@@ -292,7 +300,7 @@ export default function App() {
   const unlockAudio = useCallback(() => {
     if (audioUnlocked) return;
     
-    // Initialize/Resume Web Audio API context
+    // 1. Initialize/Resume Web Audio Context (Synthetic SFX)
     if (!audioCtx.current) {
         audioCtx.current = new (window.AudioContext || window.webkitAudioContext)();
     }
@@ -300,8 +308,14 @@ export default function App() {
         audioCtx.current.resume();
     }
     
-    // Resume/Play all buffers to "unlock" them for browser context
-    Object.values(audioRefs.current).forEach(audio => {
+    // 2. Unlock & Play BGM (0.4 volume as requested)
+    if (bgmRef.current && !isMuted) {
+       bgmRef.current.volume = 0.4;
+       bgmRef.current.play().catch(e => console.error("BGM Start Failed:", e));
+    }
+    
+    // 3. Unlock SFX buffers
+    Object.values(sfxRefs.current).forEach(audio => {
       if (audio) {
         audio.play().then(() => {
             audio.pause();
@@ -315,11 +329,20 @@ export default function App() {
     if (initialParams.current.hasMsg) {
       handleShuffle(initialParams.current.level);
     }
-  }, [audioUnlocked, handleShuffle]);
+  }, [audioUnlocked, isMuted, handleShuffle]);
 
   const playSfx = useCallback((type) => {
     if (isMuted || !audioUnlocked || !audioCtx.current) return;
     
+    // Standard SFX (Native Audio)
+    const sound = sfxRefs.current[type];
+    if (sound) {
+      sound.currentTime = 0;
+      sound.play().catch(() => {});
+      return;
+    }
+    
+    // Backup: Synthetic Generator
     const ctx = audioCtx.current;
     if (ctx.state === 'suspended') ctx.resume();
 
