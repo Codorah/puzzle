@@ -28,12 +28,12 @@ const DEFAULT_GALLERY = [
 ];
 
 /**
- * Audio Assets (Using stable, widely-accessible URLs)
+ * Senior Audio Architecture: Stable Constants
  */
-const AUDIO_URLS = {
-  // Background Ambient Loop - Using a stable Archive.org or SoundHelix source
-  bg: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'
-};
+const BGM_URL = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3';
+const SLIDE_SFX_URL = 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3';
+const VICTORY_SFX_URL = 'https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3';
+const SHUFFLE_SFX_URL = 'https://assets.mixkit.co/active_storage/sfx/1103/1103-preview.mp3';
 
 /**
  * i18n Translation Dictionary
@@ -134,7 +134,6 @@ export default function App() {
   // Settings State
   const [userName, setUserName] = useState('Player');
   const [theme, setTheme] = useState('dark');
-  const [soundEnabled, setSoundEnabled] = useState(true);
   const [lang, setLang] = useState(() => {
     const saved = localStorage.getItem('lumina_lang');
     if (saved) return saved;
@@ -146,12 +145,15 @@ export default function App() {
   // Records State
   const [records, setRecords] = useState({}); // { '3': { time: 10, moves: 20 }, ... }
 
-  // Audio management
+  // Audio management (Senior Game Dev Implementation)
   const audioRefs = useRef({
-    bg: new Audio(AUDIO_URLS.bg)
+    bg: new Audio(BGM_URL),
+    slide: new Audio(SLIDE_SFX_URL),
+    victory: new Audio(VICTORY_SFX_URL),
+    shuffle: new Audio(SHUFFLE_SFX_URL)
   });
-  const audioCtx = useRef(null);
   const [audioUnlocked, setAudioUnlocked] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
   const initialParams = useRef({ level: 3, hasMsg: false });
 
   // i18n helper
@@ -172,38 +174,68 @@ export default function App() {
     });
   }, []);
 
-  // Audio Initialization & Background Loop
+  // Audio Initialization & BGM Control
   useEffect(() => {
+    // 1. Load Mute State from storage
+    localforage.getItem('lumina_muted').then(val => {
+       if (val !== null) setIsMuted(val);
+    });
+
     const bg = audioRefs.current.bg;
     bg.loop = true;
-    bg.volume = 0.2; // Ambient level
-    
-    if (soundEnabled && audioUnlocked) {
-      bg.play().catch(e => console.log("Audio play blocked:", e));
-    } else {
-      bg.pause();
-    }
-    
-    // Cleanup on unmount
+    bg.preload = "auto";
+    bg.volume = 0; // Start at 0 for fade-in
+
+    // 2. Preload SFX
+    Object.values(audioRefs.current).forEach(a => {
+        a.preload = "auto";
+    });
+
     return () => {
       bg.pause();
     };
-  }, [soundEnabled, audioUnlocked]);
+  }, []);
+
+  // BGM Logic: Play/Pause/Fade
+  useEffect(() => {
+    const bg = audioRefs.current.bg;
+    bg.muted = isMuted;
+
+    if (!isMuted && audioUnlocked) {
+        bg.play().then(() => {
+            // Smooth Fade-in
+            let vol = 0;
+            const fadeIn = setInterval(() => {
+              vol += 0.05;
+              if (vol >= 0.3) {
+                  bg.volume = 0.3;
+                  clearInterval(fadeIn);
+              } else {
+                  bg.volume = vol;
+              }
+            }, 100);
+        }).catch(e => console.log("Audio play blocked:", e));
+    } else {
+      bg.pause();
+    }
+  }, [isMuted, audioUnlocked]);
+
+  const toggleMute = () => {
+    const newVal = !isMuted;
+    setIsMuted(newVal);
+    localforage.setItem('lumina_muted', newVal);
+  };
 
   const unlockAudio = useCallback(() => {
     if (audioUnlocked) return;
     
-    // Initialize Web Audio API context for synthetic sounds
-    if (!audioCtx.current) {
-        audioCtx.current = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    
-    // Resume BG music
-    const bg = audioRefs.current.bg;
-    bg.play().then(() => {
-        bg.pause();
-        bg.currentTime = 0;
-    }).catch(() => {});
+    // Resume/Play all buffers to "unlock" them for browser context
+    Object.values(audioRefs.current).forEach(audio => {
+      audio.play().then(() => {
+        audio.pause();
+        audio.currentTime = 0;
+      }).catch(() => {});
+    });
     
     setAudioUnlocked(true);
     
@@ -213,51 +245,14 @@ export default function App() {
   }, [audioUnlocked, handleShuffle]);
 
   const playSfx = useCallback((type) => {
-    if (!soundEnabled || !audioUnlocked || !audioCtx.current) return;
+    if (isMuted || !audioUnlocked) return;
     
-    const ctx = audioCtx.current;
-    if (ctx.state === 'suspended') ctx.resume();
-
-    if (type === 'slide') {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(500, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.1);
-      gain.gain.setValueAtTime(0.2, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.1);
-    } else if (type === 'shuffle') {
-      for(let i=0; i<5; i++) {
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.type = 'square';
-        o.frequency.setValueAtTime(200 + Math.random()*200, ctx.currentTime + i*0.05);
-        g.gain.setValueAtTime(0.05, ctx.currentTime + i*0.05);
-        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i*0.05 + 0.04);
-        o.connect(g);
-        g.connect(ctx.destination);
-        o.start(ctx.currentTime + i*0.05);
-        o.stop(ctx.currentTime + i*0.05 + 0.04);
-      }
-    } else if (type === 'victory') {
-      [440, 554, 659, 880].forEach((freq, i) => {
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.type = 'triangle';
-        o.frequency.setValueAtTime(freq, ctx.currentTime + i*0.15);
-        g.gain.setValueAtTime(0.1, ctx.currentTime + i*0.15);
-        g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i*0.15 + 0.4);
-        o.connect(g);
-        g.connect(ctx.destination);
-        o.start(ctx.currentTime + i*0.15);
-        o.stop(ctx.currentTime + i*0.15 + 0.4);
-      });
+    const sound = audioRefs.current[type];
+    if (sound) {
+      sound.currentTime = 0;
+      sound.play().catch(() => {});
     }
-  }, [soundEnabled, audioUnlocked]);
+  }, [isMuted, audioUnlocked]);
 
   const triggerHaptic = useCallback(() => {
     if (window.navigator.vibrate) {
@@ -713,7 +708,7 @@ export default function App() {
             <div className="settings-section">
               <span style={{ fontWeight: 600 }}>{t('sound')}</span>
               <label className="toggle-switch">
-                <input type="checkbox" checked={soundEnabled} onChange={() => setSoundEnabled(!soundEnabled)} />
+                <input type="checkbox" checked={!isMuted} onChange={toggleMute} />
                 <span className="toggle-slider"></span>
               </label>
             </div>
