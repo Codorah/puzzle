@@ -202,76 +202,13 @@ export default function App() {
     };
   }, []);
 
-  // BGM Logic: Play/Pause/Fade
-  useEffect(() => {
-    const bg = audioRefs.current.bg;
-    if (!bg) return;
-
-    bg.muted = isMuted;
-
-    if (!isMuted && audioUnlocked) {
-        bg.play().then(() => {
-            // Smooth Fade-in
-            let vol = 0;
-            const fadeIn = setInterval(() => {
-              if (!bg) { clearInterval(fadeIn); return; }
-              vol += 0.05;
-              if (vol >= 0.3) {
-                  bg.volume = 0.3;
-                  clearInterval(fadeIn);
-              } else {
-                  bg.volume = vol;
-              }
-            }, 100);
-        }).catch(e => console.log("Audio play blocked:", e));
-    } else {
-      bg.pause();
-    }
-  }, [isMuted, audioUnlocked]);
-
-  const toggleMute = () => {
-    const newVal = !isMuted;
-    setIsMuted(newVal);
-    localforage.setItem('lumina_muted', newVal);
-  };
-
-  const unlockAudio = useCallback(() => {
-    if (audioUnlocked) return;
-    
-    // Resume/Play all buffers to "unlock" them for browser context
-    Object.values(audioRefs.current).forEach(audio => {
-      if (audio) {
-        audio.play().then(() => {
-            audio.pause();
-            audio.currentTime = 0;
-        }).catch(() => {});
-      }
-    });
-    
-    setAudioUnlocked(true);
-    
-    if (initialParams.current.hasMsg) {
-      handleShuffle(initialParams.current.level);
-    }
-  }, [audioUnlocked, handleShuffle]);
-
-  const playSfx = useCallback((type) => {
-    if (isMuted || !audioUnlocked) return;
-    
-    const sound = audioRefs.current[type];
-    if (sound) {
-      sound.currentTime = 0;
-      sound.play().catch(() => {});
-    }
-  }, [isMuted, audioUnlocked]);
-
   const triggerHaptic = useCallback(() => {
     if (window.navigator.vibrate) {
       window.navigator.vibrate(10);
     }
   }, []);
 
-  // Shuffle Logic MUST be defined before it's used in initial effect
+  // Shuffle Logic MUST be defined before it's used in initial effect or other callbacks
   const handleShuffle = useCallback((targetLevel) => {
     if (!targetLevel) {
       setView('level');
@@ -307,6 +244,75 @@ export default function App() {
       setIsPreviewMode(false);
     }, 50);
   }, []);
+
+  const unlockAudio = useCallback(() => {
+    if (audioUnlocked) return;
+    
+    // Initialize Web Audio API context for synthetic sounds
+    if (!audioCtx.current) {
+        audioCtx.current = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    
+    // Resume BG music
+    const bg = audioRefs.current.bg;
+    bg.play().then(() => {
+        bg.pause();
+        bg.currentTime = 0;
+    }).catch(() => {});
+    
+    setAudioUnlocked(true);
+    
+    if (initialParams.current.hasMsg) {
+      handleShuffle(initialParams.current.level);
+    }
+  }, [audioUnlocked, handleShuffle]);
+
+  const playSfx = useCallback((type) => {
+    if (isMuted || !audioUnlocked || !audioCtx.current) return;
+    
+    const ctx = audioCtx.current;
+    if (ctx.state === 'suspended') ctx.resume();
+
+    if (type === 'slide') {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(500, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.2, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.1);
+    } else if (type === 'shuffle') {
+      for(let i=0; i<5; i++) {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = 'square';
+        o.frequency.setValueAtTime(200 + Math.random()*200, ctx.currentTime + i*0.05);
+        g.gain.setValueAtTime(0.05, ctx.currentTime + i*0.05);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i*0.05 + 0.04);
+        o.connect(g);
+        g.connect(ctx.destination);
+        o.start(ctx.currentTime + i*0.05);
+        o.stop(ctx.currentTime + i*0.05 + 0.04);
+      }
+    } else if (type === 'victory') {
+      [440, 554, 659, 880].forEach((freq, i) => {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = 'triangle';
+        o.frequency.setValueAtTime(freq, ctx.currentTime + i*0.15);
+        g.gain.setValueAtTime(0.1, ctx.currentTime + i*0.15);
+        g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i*0.15 + 0.4);
+        o.connect(g);
+        g.connect(ctx.destination);
+        o.start(ctx.currentTime + i*0.15);
+        o.stop(ctx.currentTime + i*0.15 + 0.4);
+      });
+    }
+  }, [isMuted, audioUnlocked]);
 
   // Initial URL parsing
   useEffect(() => {
