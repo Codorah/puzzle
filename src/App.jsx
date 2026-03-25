@@ -212,28 +212,26 @@ export default function App() {
   // BGM Logic: Play/Pause/Fade/Mute (Unified Sync)
   useEffect(() => {
     const bg = audioRef.current.bg;
-    if (!bg) return;
-
-    bg.muted = isMuted;
-
-    if (!isMuted && audioUnlocked) {
-        bg.play().then(() => {
-            // Smooth Fade-in
-            let vol = 0;
-            const fadeIn = setInterval(() => {
-              if (!audioRef.current.bg) { clearInterval(fadeIn); return; }
-              vol += 0.05;
-              if (vol >= 0.3) {
-                  audioRef.current.bg.volume = 0.3;
-                  clearInterval(fadeIn);
-              } else {
-                  audioRef.current.bg.volume = vol;
-              }
-            }, 100);
-        }).catch(e => console.log("Audio play blocked:", e));
-    } else {
-      bg.pause();
+    if (!bg || !audioUnlocked || isMuted) {
+       if (bg) bg.pause();
+       return;
     }
+
+    bg.muted = false;
+    bg.play().then(() => {
+        // Smooth Fade-in to 0.4 (Expert Request)
+        let vol = bg.volume;
+        const fadeIn = setInterval(() => {
+          if (!audioRef.current.bg) { clearInterval(fadeIn); return; }
+          vol += 0.05;
+          if (vol >= 0.4) {
+              audioRef.current.bg.volume = 0.4;
+              clearInterval(fadeIn);
+          } else {
+              audioRef.current.bg.volume = vol;
+          }
+        }, 100);
+    }).catch(e => console.log("BGM play blocked:", e));
   }, [isMuted, audioUnlocked]);
 
   const toggleMute = () => {
@@ -299,22 +297,26 @@ export default function App() {
         audioCtx.current.resume();
     }
     
-    // 2. Unlock & Play All Buffers (Unified Ref)
-    Object.values(audioRef.current).forEach(audio => {
+    // 2. Unlock Audio Buffers (Native HTML5)
+    // We play and pause EVERYTHING except the BGM once to unlock for mobile
+    Object.entries(audioRef.current).forEach(([key, audio]) => {
       if (audio) {
         audio.play().then(() => {
-            audio.pause();
-            audio.currentTime = 0;
+            if (key !== 'bg') {
+                audio.pause();
+                audio.currentTime = 0;
+            }
         }).catch(() => {});
       }
     });
     
     setAudioUnlocked(true);
+    setIsReady(true); // Transition from Splash to Game
     
     if (initialParams.current.hasMsg) {
       handleShuffle(initialParams.current.level);
     }
-  }, [audioUnlocked, isMuted, handleShuffle]);
+  }, [audioUnlocked, initialParams, handleShuffle]);
 
   const playSfx = useCallback((type) => {
     if (isMuted || !audioUnlocked || !audioCtx.current) return;
