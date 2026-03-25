@@ -193,28 +193,69 @@ export default function App() {
   const unlockAudio = useCallback(() => {
     if (audioUnlocked) return;
     
-    // Resume/Play all buffers to "unlock" them for the browser session
-    Object.values(audioRefs.current).forEach(audio => {
-      audio.play().then(() => {
-        audio.pause();
-        audio.currentTime = 0;
-      }).catch(() => {});
-    });
+    // Initialize Web Audio API context for synthetic sounds
+    if (!audioCtx.current) {
+        audioCtx.current = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    
+    // Resume BG music
+    const bg = audioRefs.current.bg;
+    bg.play().then(() => {
+        bg.pause();
+        bg.currentTime = 0;
+    }).catch(() => {});
     
     setAudioUnlocked(true);
     
-    // If we have a shared mystery message, start it now that audio is ready
     if (initialParams.current.hasMsg) {
       handleShuffle(initialParams.current.level);
     }
-  }, [audioUnlocked]); // Remove dependency on handleShuffle to avoid loops
+  }, [audioUnlocked, handleShuffle]);
 
   const playSfx = useCallback((type) => {
-    if (!soundEnabled || !audioUnlocked) return;
-    const sound = audioRefs.current[type];
-    if (sound) {
-      sound.currentTime = 0;
-      sound.play().catch(() => {});
+    if (!soundEnabled || !audioUnlocked || !audioCtx.current) return;
+    
+    const ctx = audioCtx.current;
+    if (ctx.state === 'suspended') ctx.resume();
+
+    if (type === 'slide') {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(500, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.2, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.1);
+    } else if (type === 'shuffle') {
+      for(let i=0; i<5; i++) {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = 'square';
+        o.frequency.setValueAtTime(200 + Math.random()*200, ctx.currentTime + i*0.05);
+        g.gain.setValueAtTime(0.05, ctx.currentTime + i*0.05);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i*0.05 + 0.04);
+        o.connect(g);
+        g.connect(ctx.destination);
+        o.start(ctx.currentTime + i*0.05);
+        o.stop(ctx.currentTime + i*0.05 + 0.04);
+      }
+    } else if (type === 'victory') {
+      [440, 554, 659, 880].forEach((freq, i) => {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = 'triangle';
+        o.frequency.setValueAtTime(freq, ctx.currentTime + i*0.15);
+        g.gain.setValueAtTime(0.1, ctx.currentTime + i*0.15);
+        g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i*0.15 + 0.4);
+        o.connect(g);
+        g.connect(ctx.destination);
+        o.start(ctx.currentTime + i*0.15);
+        o.stop(ctx.currentTime + i*0.15 + 0.4);
+      });
     }
   }, [soundEnabled, audioUnlocked]);
 
