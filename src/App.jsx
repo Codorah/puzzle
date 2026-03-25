@@ -202,6 +202,42 @@ export default function App() {
     };
   }, []);
 
+  // BGM Logic: Play/Pause/Fade/Mute (Senior Developer Sync)
+  useEffect(() => {
+    const bg = audioRefs.current.bg;
+    if (!bg) return;
+
+    bg.muted = isMuted;
+
+    if (!isMuted && audioUnlocked) {
+        bg.play().then(() => {
+            // Smooth Fade-in
+            let vol = 0;
+            const fadeIn = setInterval(() => {
+              if (!audioRefs.current.bg) { clearInterval(fadeIn); return; }
+              vol += 0.05;
+              if (vol >= 0.3) {
+                  audioRefs.current.bg.volume = 0.3;
+                  clearInterval(fadeIn);
+              } else {
+                  audioRefs.current.bg.volume = vol;
+              }
+            }, 100);
+        }).catch(e => console.log("Audio play blocked:", e));
+    } else {
+      bg.pause();
+    }
+  }, [isMuted, audioUnlocked]);
+
+  const toggleMute = () => {
+    const newVal = !isMuted;
+    setIsMuted(newVal);
+    if (audioRefs.current.bg) {
+        audioRefs.current.bg.muted = newVal;
+    }
+    localforage.setItem('lumina_muted', newVal);
+  };
+
   const triggerHaptic = useCallback(() => {
     if (window.navigator.vibrate) {
       window.navigator.vibrate(10);
