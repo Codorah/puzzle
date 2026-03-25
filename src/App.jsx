@@ -145,12 +145,12 @@ export default function App() {
   // Records State
   const [records, setRecords] = useState({}); // { '3': { time: 10, moves: 20 }, ... }
 
-  // Audio management (Senior Game Dev Implementation)
+  // Audio management (Senior Game Dev Implementation - Lazy Init for safety)
   const audioRefs = useRef({
-    bg: new Audio(BGM_URL),
-    slide: new Audio(SLIDE_SFX_URL),
-    victory: new Audio(VICTORY_SFX_URL),
-    shuffle: new Audio(SHUFFLE_SFX_URL)
+    bg: null,
+    slide: null,
+    victory: null,
+    shuffle: null
   });
   const [audioUnlocked, setAudioUnlocked] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -176,29 +176,37 @@ export default function App() {
 
   // Audio Initialization & BGM Control
   useEffect(() => {
-    // 1. Load Mute State from storage
+    // 1. Initialize Audio Objects on mount (Defensive)
+    try {
+        audioRefs.current.bg = new Audio(BGM_URL);
+        audioRefs.current.slide = new Audio(SLIDE_SFX_URL);
+        audioRefs.current.victory = new Audio(VICTORY_SFX_URL);
+        audioRefs.current.shuffle = new Audio(SHUFFLE_SFX_URL);
+        
+        Object.values(audioRefs.current).forEach(a => {
+            if (a) a.preload = "auto";
+        });
+        audioRefs.current.bg.loop = true;
+        audioRefs.current.bg.volume = 0;
+    } catch (e) {
+        console.error("Audio init failed:", e);
+    }
+
+    // 2. Load Mute State from storage
     localforage.getItem('lumina_muted').then(val => {
        if (val !== null) setIsMuted(val);
     });
 
-    const bg = audioRefs.current.bg;
-    bg.loop = true;
-    bg.preload = "auto";
-    bg.volume = 0; // Start at 0 for fade-in
-
-    // 2. Preload SFX
-    Object.values(audioRefs.current).forEach(a => {
-        a.preload = "auto";
-    });
-
     return () => {
-      bg.pause();
+      if (audioRefs.current.bg) audioRefs.current.bg.pause();
     };
   }, []);
 
   // BGM Logic: Play/Pause/Fade
   useEffect(() => {
     const bg = audioRefs.current.bg;
+    if (!bg) return;
+
     bg.muted = isMuted;
 
     if (!isMuted && audioUnlocked) {
@@ -206,6 +214,7 @@ export default function App() {
             // Smooth Fade-in
             let vol = 0;
             const fadeIn = setInterval(() => {
+              if (!bg) { clearInterval(fadeIn); return; }
               vol += 0.05;
               if (vol >= 0.3) {
                   bg.volume = 0.3;
@@ -231,10 +240,12 @@ export default function App() {
     
     // Resume/Play all buffers to "unlock" them for browser context
     Object.values(audioRefs.current).forEach(audio => {
-      audio.play().then(() => {
-        audio.pause();
-        audio.currentTime = 0;
-      }).catch(() => {});
+      if (audio) {
+        audio.play().then(() => {
+            audio.pause();
+            audio.currentTime = 0;
+        }).catch(() => {});
+      }
     });
     
     setAudioUnlocked(true);
