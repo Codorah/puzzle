@@ -595,27 +595,16 @@ export default function App() {
       {!audioUnlocked && (
         <div className="audio-unlock-overlay" onClick={unlockAudio}>
            <div className="unlock-content">
-             <div className="brand-logo" style={{ fontSize: '4.5rem', marginBottom: '20px' }}>
+             <div className="brand-logo brand-logo-large">
                <span className="brand-col-1">LU</span><span className="brand-col-2">MINA</span>
              </div>
-             <p style={{ color: '#aaa', marginBottom: '40px', fontSize: '1.2rem', letterSpacing: '4px', textAlign: 'center' }}>
+             <p className="unlock-subtitle">
                 PUZZLE ELITE
              </p>
-             <button 
-               className="btn-primary" 
-               style={{ 
-                 padding: '24px 70px', 
-                 borderRadius: '60px', 
-                 fontSize: '1.4rem', 
-                 fontWeight: 'bold',
-                 background: 'var(--accent-blue)',
-                 color: '#fff',
-                 boxShadow: '0 0 50px rgba(59, 130, 246, 0.6)'
-               }}
-             >
+             <button className="btn-primary btn-start">
                COMMENCER
              </button>
-             <p style={{ marginTop: '20px', color: '#666', fontSize: '0.8rem' }}>
+             <p className="unlock-hint">
                 Appuyez n'importe où pour activer le son
              </p>
            </div>

@@ -631,21 +631,67 @@ body {
 .audio-unlock-overlay {
   position: fixed;
   inset: 0;
-  z-index: 99999; /* Max priority */
-  background: #0a0a0b; /* Solid fallback */
+  z-index: 99999;
   background: radial-gradient(circle at center, #16161e 0%, #0a0a0b 100%);
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: var(--spacing-lg);
   cursor: pointer;
 }
 
 .unlock-content {
+  width: 100%;
+  max-width: 400px;
   text-align: center;
   animation: slideUpFade 0.8s ease-out;
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.brand-logo-large {
+  font-size: clamp(2.5rem, 10vw, 4.5rem);
+  margin-bottom: var(--spacing-md);
+}
+
+.unlock-subtitle {
+  color: var(--text-muted);
+  font-size: clamp(0.9rem, 4vw, 1.2rem);
+  letter-spacing: 4px;
+  margin-bottom: var(--spacing-lg);
+  text-transform: uppercase;
+}
+
+.btn-start {
+  padding: clamp(16px, 5vw, 24px) clamp(40px, 15vw, 70px);
+  font-size: clamp(1.1rem, 4vw, 1.4rem);
+  border-radius: 60px;
+  background: var(--accent-blue);
+  color: #fff;
+  box-shadow: 0 0 50px rgba(59, 130, 246, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-start:active {
+  transform: scale(0.95);
+}
+
+.unlock-hint {
+  margin-top: var(--spacing-lg);
+  color: #555;
+  font-size: clamp(0.7rem, 3vw, 0.85rem);
+}
+
+/* Responsiveness Hardening */
+@media (max-height: 600px) {
+  .brand-logo-large { font-size: 2rem; margin-bottom: 10px; }
+  .unlock-subtitle { font-size: 0.8rem; margin-bottom: 20px; }
+  .btn-start { padding: 12px 40px; font-size: 1rem; }
+  .unlock-hint { margin-top: 10px; }
+  
+  .app-header { --header-height: 50px; }
+  .app-toolbar { --toolbar-height: 60px; }
 }
 
 @keyframes slideUpFade {
