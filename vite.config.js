@@ -10,7 +10,8 @@ export default defineConfig({
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       workbox: {
         // Cache all application files and gallery images for complete offline execution
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg,webmanifest,mp3,ogg}']
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg,webmanifest,mp3,ogg}'],
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024 // Allow up to 5MB for BGM
       },
       manifest: {
         name: 'Lumina: Premium Puzzle',
