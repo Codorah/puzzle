@@ -152,6 +152,7 @@ export default function App() {
     victory: null,
     shuffle: null
   });
+  const audioCtx = useRef(null);
   const [audioUnlocked, setAudioUnlocked] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const initialParams = useRef({ level: 3, hasMsg: false });
@@ -176,16 +177,20 @@ export default function App() {
 
   // Audio Initialization & BGM Control
   useEffect(() => {
-    // 1. Initialize Audio Objects on mount (Defensive)
+    // 1. Initialize Audio Objects on mount (Defensive + CORS fix)
     try {
-        audioRefs.current.bg = new Audio(BGM_URL);
-        audioRefs.current.slide = new Audio(SLIDE_SFX_URL);
-        audioRefs.current.victory = new Audio(VICTORY_SFX_URL);
-        audioRefs.current.shuffle = new Audio(SHUFFLE_SFX_URL);
+        const createAudio = (url) => {
+            const a = new Audio(url);
+            a.crossOrigin = "anonymous";
+            a.preload = "auto";
+            return a;
+        };
+
+        audioRefs.current.bg = createAudio(BGM_URL);
+        audioRefs.current.slide = createAudio(SLIDE_SFX_URL);
+        audioRefs.current.victory = createAudio(VICTORY_SFX_URL);
+        audioRefs.current.shuffle = createAudio(SHUFFLE_SFX_URL);
         
-        Object.values(audioRefs.current).forEach(a => {
-            if (a) a.preload = "auto";
-        });
         audioRefs.current.bg.loop = true;
         audioRefs.current.bg.volume = 0;
     } catch (e) {
@@ -199,6 +204,9 @@ export default function App() {
 
     return () => {
       if (audioRefs.current.bg) audioRefs.current.bg.pause();
+      if (audioCtx.current) {
+          audioCtx.current.close().catch(() => {});
+      }
     };
   }, []);
 
@@ -284,17 +292,23 @@ export default function App() {
   const unlockAudio = useCallback(() => {
     if (audioUnlocked) return;
     
-    // Initialize Web Audio API context for synthetic sounds
+    // Initialize/Resume Web Audio API context
     if (!audioCtx.current) {
         audioCtx.current = new (window.AudioContext || window.webkitAudioContext)();
     }
+    if (audioCtx.current.state === 'suspended') {
+        audioCtx.current.resume();
+    }
     
-    // Resume BG music
-    const bg = audioRefs.current.bg;
-    bg.play().then(() => {
-        bg.pause();
-        bg.currentTime = 0;
-    }).catch(() => {});
+    // Resume/Play all buffers to "unlock" them for browser context
+    Object.values(audioRefs.current).forEach(audio => {
+      if (audio) {
+        audio.play().then(() => {
+            audio.pause();
+            audio.currentTime = 0;
+        }).catch(() => {});
+      }
+    });
     
     setAudioUnlocked(true);
     
