@@ -513,29 +513,34 @@ export default function App() {
   const formatTime = (s) => `${Math.floor(s / 60).toString().padStart(2, '0')}:${(s % 60).toString().padStart(2, '0')}`;
 
   return (
-    <div className="app-shell" onClick={unlockAudio}>
-      {/* 1. Premium Audio Unlock Overlay (Glassmorphism) */}
+    <div className="app-shell">
+      {/* 1. Premium Audio Unlock Overlay (Glassmorphism + Click anywhere to start) */}
       {!audioUnlocked && (
-        <div className="audio-unlock-overlay">
+        <div className="audio-unlock-overlay" onClick={unlockAudio}>
            <div className="unlock-content">
              <div className="brand-logo" style={{ fontSize: '4.5rem', marginBottom: '20px' }}>
                <span className="brand-col-1">LU</span><span className="brand-col-2">MINA</span>
              </div>
-             <p style={{ color: 'var(--text-muted)', marginBottom: '40px', fontSize: '1.1rem', letterSpacing: '2px', fontWeight: 300 }}>PUZZLE ELITE</p>
+             <p style={{ color: '#aaa', marginBottom: '40px', fontSize: '1.2rem', letterSpacing: '4px', textAlign: 'center' }}>
+                PUZZLE ELITE
+             </p>
              <button 
                className="btn-primary" 
                style={{ 
-                 padding: '18px 50px', 
-                 borderRadius: '50px', 
-                 fontSize: '1.2rem', 
-                 fontWeight: 900,
-                 boxShadow: '0 0 40px rgba(59, 130, 246, 0.4)',
-                 border: '2px solid rgba(255, 255, 255, 0.1)'
-               }} 
-               onClick={unlockAudio}
+                 padding: '24px 70px', 
+                 borderRadius: '60px', 
+                 fontSize: '1.4rem', 
+                 fontWeight: 'bold',
+                 background: 'var(--accent-blue)',
+                 color: '#fff',
+                 boxShadow: '0 0 50px rgba(59, 130, 246, 0.6)'
+               }}
              >
                COMMENCER
              </button>
+             <p style={{ marginTop: '20px', color: '#666', fontSize: '0.8rem' }}>
+                Appuyez n'importe où pour activer le son
+             </p>
            </div>
         </div>
       )}
